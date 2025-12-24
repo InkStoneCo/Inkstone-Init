@@ -633,18 +633,18 @@
 |--------|-----------|-----------|------|
 | Sprint 0 | Monorepo 結構 | 開發環境 | ✅ 完成 |
 | Sprint 1 | Extension + Sidebar | 安裝、面板顯示 | ✅ 完成 |
-| Sprint 2 | Init 模組 | 一鍵初始化 |
-| Sprint 3 | 筆記核心 | 右鍵插入、TreeView |
-| Sprint 4 | 筆記進階 | 自動補全、跳轉 |
-| Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 |
-| Sprint 6 | SPARC 模式 | 按鈕執行指令 |
-| Sprint 7 | Swarm 協調 | 初始化、監控 |
-| Sprint 8 | Vibe Coding | 階段式引導 |
-| Sprint 9 | Gherkin 測試 | 自動生成 |
-| Sprint 10 | 需求管理 | 新需求分類 |
-| Sprint 11 | 多 AI 支援 | Gemini/Codex |
-| Sprint 12 | 測試優化 | 完整測試 |
-| Sprint 13 | 發布 | Marketplace 上架 |
+| Sprint 2 | Init 模組 | 一鍵初始化 | 🔜 待開始 |
+| Sprint 3 | 筆記核心 | 右鍵插入、TreeView | 🔜 待開始 |
+| Sprint 4 | 筆記進階 | 自動補全、跳轉 | 🔜 待開始 |
+| Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 | 🔜 待開始 |
+| Sprint 6 | SPARC 模式 | 按鈕執行指令 | 🔜 待開始 |
+| Sprint 7 | Swarm 協調 | 初始化、監控 | 🔜 待開始 |
+| Sprint 8 | Vibe Coding | 階段式引導 | 🔜 待開始 |
+| Sprint 9 | Gherkin 測試 | 自動生成 | 🔜 待開始 |
+| Sprint 10 | 需求管理 | 新需求分類 | 🔜 待開始 |
+| Sprint 11 | 多 AI 支援 | Gemini/Codex | 🔜 待開始 |
+| Sprint 12 | 測試優化 | 完整測試 | 🔜 待開始 |
+| Sprint 13 | 發布 | Marketplace 上架 | 🔜 待開始 |
 
 ---
 
