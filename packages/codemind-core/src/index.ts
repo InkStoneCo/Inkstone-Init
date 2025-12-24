@@ -1,4 +1,4 @@
-// @uncle6/codemind-core - Core library for Code-Mind
+// @inkstone/codemind-core - Core library for Code-Mind
 // Parser, Writer, NoteStore, BacklinkManager
 
 export * from './types/index.js';
