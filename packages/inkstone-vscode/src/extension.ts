@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1 實作
+// Sprint 1 + Sprint 2 實作
 
 import * as vscode from 'vscode';
 import {
@@ -21,6 +21,7 @@ import {
   VibeCodingTreeProvider,
   clearHoverCache,
 } from './providers/index.js';
+import { scaffoldProject, type AITool } from './init/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
