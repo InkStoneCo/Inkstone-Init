@@ -6,7 +6,7 @@ import {
   parseMultilineContent,
   formatNoteContent,
 } from './processor.js';
-import type { NoteId } from '@uncle6/codemind-core';
+import type { NoteId } from '@inkstone/codemind-core';
 
 describe('PATTERNS', () => {
   describe('newNote', () => {
