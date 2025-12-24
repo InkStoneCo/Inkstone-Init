@@ -39,7 +39,7 @@ export interface NoteStore {
   search(query: string, limit?: number): SearchResult[];
 
   // 修改
-  addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId): Note;
+  addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId, extraProperties?: Partial<NoteProperties>): Note;
   updateNote(id: NoteId, content: string): Note;
   deleteNote(id: NoteId): void;
   moveNote(id: NoteId, newFile: string, newLine?: number): Note;
