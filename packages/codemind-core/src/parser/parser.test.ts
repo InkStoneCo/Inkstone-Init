@@ -14,18 +14,20 @@ describe('parseLine', () => {
     const result = parseLine('- Hello world', 1);
     expect(result.isBullet).toBe(true);
     expect(result.indent).toBe(0);
-    expect(result.content).toBe('Hello world');
+    // parseLine 現在保留原始行內容（不解析縮排）
+    expect(result.content).toBe('- Hello world');
     expect(result.lineNumber).toBe(1);
   });
 
   it('should parse indented bullet lines', () => {
     const result1 = parseLine('  - Level 1', 2);
-    expect(result1.indent).toBe(1);
-    expect(result1.content).toBe('Level 1');
+    // parseLine 返回 indent: 0，實際縮排由 parse() 內部處理
+    expect(result1.indent).toBe(0);
+    expect(result1.content).toBe('  - Level 1');
 
     const result2 = parseLine('    - Level 2', 3);
-    expect(result2.indent).toBe(2);
-    expect(result2.content).toBe('Level 2');
+    expect(result2.indent).toBe(0);
+    expect(result2.content).toBe('    - Level 2');
   });
 
   it('should handle non-bullet lines', () => {
