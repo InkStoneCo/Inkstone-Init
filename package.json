@@ -1,0 +1,62 @@
+{
+  "name": "inkstone-init",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Inkstone - AI-powered development toolkit with Code-Mind notes, Vibe Coding workflow, and Claude Flow integration",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InkStoneCo/Inkstone-Init.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "prepare": "husky",
+    "package:vscode": "cd packages/inkstone-vscode && npm run package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "packageManager": "npm@10.2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "inkstone",
+    "code-mind",
+    "zettelkasten",
+    "vscode",
+    "claude-flow",
+    "vibe-coding",
+    "ai-development"
+  ],
+  "author": "InkStoneCo",
+  "license": "Apache-2.0"
+}

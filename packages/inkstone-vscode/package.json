@@ -1,0 +1,90 @@
+{
+  "name": "codemind-vscode",
+  "displayName": "Code-Mind",
+  "description": "AI-friendly Zettelkasten note system for code",
+  "version": "0.1.0",
+  "publisher": "codemind",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:codemind.md",
+    "onLanguage:markdown",
+    "onLanguage:typescript",
+    "onLanguage:javascript"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codemind.addNote",
+        "title": "Code-Mind: Add Note Here"
+      },
+      {
+        "command": "codemind.goToNote",
+        "title": "Code-Mind: Go to Note"
+      },
+      {
+        "command": "codemind.findReferences",
+        "title": "Code-Mind: Find All References"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "codemind.addNote",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codemind.addNote",
+          "group": "codemind@1"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "codemind-notes",
+          "name": "Code-Mind Notes"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "build": "npm run esbuild-base -- --sourcemap",
+    "dev": "npm run esbuild-base -- --sourcemap --watch",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "package": "vsce package --no-dependencies --allow-missing-repository"
+  },
+  "dependencies": {
+    "@uncle6/codemind-core": "*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/vsce": "^2.22.0",
+    "esbuild": "^0.27.1",
+    "eslint-config-prettier": "^9.1.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "codemind",
+    "vscode",
+    "zettelkasten",
+    "notes"
+  ],
+  "license": "Apache-2.0"
+}
