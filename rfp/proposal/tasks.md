@@ -18,19 +18,19 @@
 
 ### 任務 0.1: Monorepo 設置
 
-- [ ] **0.1.1 整合 Code-Mind 到專案**
+- [x] **0.1.1 整合 Code-Mind 到專案** ✅ 2024-12-24
   - 移除 `Code-Mind/.git` 目錄
   - 調整 package.json 為 workspace 成員
-  - 更新依賴引用路徑
+  - 更新依賴引用路徑（namespace 從 `@uncle6/*` 遷移到 `@inkstone/*`）
   - _需求: 需求 5_
 
-- [ ] **0.1.2 建立統一的專案結構**
+- [x] **0.1.2 建立統一的專案結構** ✅ 2024-12-24
   - 建立 `packages/inkstone-vscode/` 目錄
   - 建立 `packages/codemind-core/` 目錄
-  - 配置 npm/pnpm workspace
+  - 配置 npm workspace（5 個 packages）
   - _需求: 6.1_
 
-- [ ] **0.1.3 開發環境配置**
+- [x] **0.1.3 開發環境配置** ✅ 2024-12-24
   - 配置 TypeScript (tsconfig.json)
   - 配置 ESLint + Prettier
   - 配置 Vitest 測試框架
