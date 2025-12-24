@@ -196,38 +196,17 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
     })
   );
 
-  // Memory commands
+  // Memory commands (Sprint 5 實作)
   context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.saveMemory', async () => {
-      const content = await vscode.window.showInputBox({
-        prompt: 'Enter memory content',
-        placeHolder: 'What do you want to remember?',
-      });
-      if (content) {
-        vscode.window.showInformationMessage(`Inkstone: Memory saved: "${content}"`);
-        // TODO: Implement in Sprint 5
-      }
-    })
+    vscode.commands.registerCommand('inkstone.saveMemory', saveMemoryHandler)
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.restoreMemory', () => {
-      vscode.window.showInformationMessage('Inkstone: Restoring memories...');
-      // TODO: Implement in Sprint 5
-    })
+    vscode.commands.registerCommand('inkstone.restoreMemory', restoreMemoryHandler)
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.searchMemory', async () => {
-      const query = await vscode.window.showInputBox({
-        prompt: 'Search memories',
-        placeHolder: 'Enter search query...',
-      });
-      if (query) {
-        vscode.window.showInformationMessage(`Inkstone: Searching for "${query}"...`);
-        // TODO: Implement in Sprint 5
-      }
-    })
+    vscode.commands.registerCommand('inkstone.searchMemory', searchMemoryHandler)
   );
 
   // SPARC commands
