@@ -122,12 +122,31 @@ class ExtensionStore {
   /**
    * Add a new note
    */
-  addNote(file: string, content: string, parentId?: NoteId): Note | null {
-    const note = this.store?.addNote(file, content, parentId);
+  addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId, extraProperties?: Partial<NoteProperties>): Note | null {
+    const note = this.store?.addNote(file, content, parentId, noteId, extraProperties);
     if (note) {
       this._onDidChange.fire();
     }
     return note || null;
+  }
+
+  /**
+   * Update a note's content
+   */
+  updateNote(id: NoteId, content: string): Note | null {
+    const note = this.store?.updateNote(id, content);
+    if (note) {
+      this._onDidChange.fire();
+    }
+    return note || null;
+  }
+
+  /**
+   * Delete a note
+   */
+  deleteNote(id: NoteId): void {
+    this.store?.deleteNote(id);
+    this._onDidChange.fire();
   }
 
   /**
