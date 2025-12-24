@@ -34,7 +34,7 @@ __export(extension_exports, {
   deactivate: () => deactivate
 });
 module.exports = __toCommonJS(extension_exports);
-var vscode9 = __toESM(require("vscode"));
+var vscode10 = __toESM(require("vscode"));
 
 // src/store.ts
 var vscode = __toESM(require("vscode"));
@@ -1970,8 +1970,302 @@ var VibeCodingTreeProvider = class {
   }
 };
 
-// src/init/scaffold.ts
+// src/daemon-manager.ts
 var vscode8 = __toESM(require("vscode"));
+var DaemonManager = class {
+  statusBarItem;
+  state = "stopped";
+  outputChannel;
+  updateTimer = null;
+  _onStateChange = new vscode8.EventEmitter();
+  onStateChange = this._onStateChange.event;
+  // 模擬的統計數據（實際會從 daemon 取得）
+  processedFiles = 0;
+  errorCount = 0;
+  startTime = null;
+  constructor() {
+    this.statusBarItem = vscode8.window.createStatusBarItem(
+      vscode8.StatusBarAlignment.Right,
+      100
+    );
+    this.statusBarItem.command = "inkstone.daemon.showMenu";
+    this.outputChannel = vscode8.window.createOutputChannel("Code-Mind Daemon");
+    this.updateStatusBar();
+  }
+  /**
+   * 啟動 daemon
+   */
+  async start() {
+    if (this.state === "running") {
+      vscode8.window.showInformationMessage("Code-Mind daemon is already running");
+      return;
+    }
+    this.setState("starting");
+    this.log("Starting Code-Mind daemon...");
+    try {
+      await this.simulateStart();
+      this.startTime = Date.now();
+      this.setState("running");
+      this.log("Code-Mind daemon started successfully");
+      this.startStatusUpdates();
+      vscode8.window.showInformationMessage("Code-Mind daemon started");
+    } catch (error) {
+      this.setState("error");
+      this.log(`Failed to start daemon: ${error}`);
+      vscode8.window.showErrorMessage(`Failed to start Code-Mind daemon: ${error}`);
+    }
+  }
+  /**
+   * 停止 daemon
+   */
+  async stop() {
+    if (this.state === "stopped") {
+      vscode8.window.showInformationMessage("Code-Mind daemon is not running");
+      return;
+    }
+    this.log("Stopping Code-Mind daemon...");
+    try {
+      await this.simulateStop();
+      this.stopStatusUpdates();
+      this.startTime = null;
+      this.setState("stopped");
+      this.log("Code-Mind daemon stopped");
+      vscode8.window.showInformationMessage("Code-Mind daemon stopped");
+    } catch (error) {
+      this.log(`Error stopping daemon: ${error}`);
+      vscode8.window.showErrorMessage(`Error stopping Code-Mind daemon: ${error}`);
+    }
+  }
+  /**
+   * 重新啟動 daemon
+   */
+  async restart() {
+    this.log("Restarting Code-Mind daemon...");
+    await this.stop();
+    await this.start();
+  }
+  /**
+   * 取得目前狀態
+   */
+  getStatus() {
+    const info = {
+      state: this.state,
+      processedFiles: this.processedFiles,
+      errors: this.errorCount
+    };
+    if (this.startTime) {
+      info.uptime = Date.now() - this.startTime;
+    }
+    return info;
+  }
+  /**
+   * 顯示操作選單
+   */
+  async showMenu() {
+    const items = [];
+    if (this.state === "running") {
+      items.push(
+        { label: "$(debug-stop) Stop Daemon", description: "Stop the Code-Mind daemon" },
+        { label: "$(refresh) Restart Daemon", description: "Restart the Code-Mind daemon" },
+        { label: "$(search) Scan Workspace", description: "Scan workspace for code notes" },
+        { label: "$(info) Show Status", description: "Show daemon status details" }
+      );
+    } else {
+      items.push(
+        { label: "$(play) Start Daemon", description: "Start the Code-Mind daemon" },
+        { label: "$(info) Show Status", description: "Show daemon status details" }
+      );
+    }
+    items.push(
+      { label: "$(output) Show Logs", description: "Show daemon output logs" }
+    );
+    const selected = await vscode8.window.showQuickPick(items, {
+      placeHolder: "Code-Mind Daemon Actions"
+    });
+    if (!selected) return;
+    switch (selected.label) {
+      case "$(play) Start Daemon":
+        await this.start();
+        break;
+      case "$(debug-stop) Stop Daemon":
+        await this.stop();
+        break;
+      case "$(refresh) Restart Daemon":
+        await this.restart();
+        break;
+      case "$(search) Scan Workspace":
+        await this.scanWorkspace();
+        break;
+      case "$(info) Show Status":
+        this.showStatusDetails();
+        break;
+      case "$(output) Show Logs":
+        this.outputChannel.show();
+        break;
+    }
+  }
+  /**
+   * 掃描工作區
+   */
+  async scanWorkspace() {
+    this.log("Scanning workspace for code notes...");
+    await vscode8.window.withProgress(
+      {
+        location: vscode8.ProgressLocation.Notification,
+        title: "Scanning workspace...",
+        cancellable: false
+      },
+      async (progress) => {
+        progress.report({ increment: 0, message: "Starting scan..." });
+        await new Promise((resolve) => setTimeout(resolve, 1e3));
+        progress.report({ increment: 50, message: "Processing files..." });
+        await new Promise((resolve) => setTimeout(resolve, 1e3));
+        progress.report({ increment: 100, message: "Done!" });
+        this.log("Workspace scan completed");
+        vscode8.window.showInformationMessage("Workspace scan completed");
+      }
+    );
+  }
+  /**
+   * 顯示狀態詳情
+   */
+  showStatusDetails() {
+    const status = this.getStatus();
+    const uptimeStr = status.uptime ? this.formatUptime(status.uptime) : "N/A";
+    const message = [
+      `State: ${status.state}`,
+      `Uptime: ${uptimeStr}`,
+      `Processed Files: ${status.processedFiles || 0}`,
+      `Errors: ${status.errors || 0}`
+    ].join("\n");
+    vscode8.window.showInformationMessage(`Code-Mind Daemon Status
+
+${message}`);
+  }
+  /**
+   * 更新狀態列
+   */
+  updateStatusBar() {
+    const icons = {
+      stopped: "$(circle-outline)",
+      starting: "$(loading~spin)",
+      running: "$(circle-filled)",
+      error: "$(error)"
+    };
+    const colors = {
+      stopped: void 0,
+      starting: new vscode8.ThemeColor("statusBarItem.warningForeground"),
+      running: new vscode8.ThemeColor("statusBarItem.prominentForeground"),
+      error: new vscode8.ThemeColor("statusBarItem.errorForeground")
+    };
+    this.statusBarItem.text = `${icons[this.state]} Code-Mind`;
+    this.statusBarItem.color = colors[this.state];
+    const tooltipLines = ["Code-Mind Daemon"];
+    tooltipLines.push(`Status: ${this.state}`);
+    if (this.state === "running" && this.startTime) {
+      tooltipLines.push(`Uptime: ${this.formatUptime(Date.now() - this.startTime)}`);
+      tooltipLines.push(`Processed: ${this.processedFiles} files`);
+      if (this.errorCount > 0) {
+        tooltipLines.push(`Errors: ${this.errorCount}`);
+      }
+    }
+    tooltipLines.push("", "Click for options");
+    this.statusBarItem.tooltip = tooltipLines.join("\n");
+    this.statusBarItem.show();
+  }
+  /**
+   * 設定狀態
+   */
+  setState(state) {
+    this.state = state;
+    this.updateStatusBar();
+    this._onStateChange.fire(state);
+  }
+  /**
+   * 開始狀態更新
+   */
+  startStatusUpdates() {
+    this.updateTimer = setInterval(() => {
+      if (Math.random() > 0.7) {
+        this.processedFiles++;
+      }
+      this.updateStatusBar();
+    }, 5e3);
+  }
+  /**
+   * 停止狀態更新
+   */
+  stopStatusUpdates() {
+    if (this.updateTimer) {
+      clearInterval(this.updateTimer);
+      this.updateTimer = null;
+    }
+  }
+  /**
+   * 模擬啟動
+   */
+  async simulateStart() {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  /**
+   * 模擬停止
+   */
+  async simulateStop() {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+  /**
+   * 格式化運行時間
+   */
+  formatUptime(ms) {
+    const seconds = Math.floor(ms / 1e3);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    if (hours > 0) {
+      return `${hours}h ${minutes % 60}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds % 60}s`;
+    } else {
+      return `${seconds}s`;
+    }
+  }
+  /**
+   * 記錄日誌
+   */
+  log(message) {
+    const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+    this.outputChannel.appendLine(`[${timestamp}] ${message}`);
+  }
+  /**
+   * 釋放資源
+   */
+  dispose() {
+    this.stopStatusUpdates();
+    this.statusBarItem.dispose();
+    this.outputChannel.dispose();
+    this._onStateChange.dispose();
+  }
+};
+var daemonManager = null;
+function getDaemonManager() {
+  if (!daemonManager) {
+    daemonManager = new DaemonManager();
+  }
+  return daemonManager;
+}
+function registerDaemonCommands(context) {
+  const manager = getDaemonManager();
+  context.subscriptions.push(
+    vscode8.commands.registerCommand("inkstone.daemon.start", () => manager.start()),
+    vscode8.commands.registerCommand("inkstone.daemon.stop", () => manager.stop()),
+    vscode8.commands.registerCommand("inkstone.daemon.restart", () => manager.restart()),
+    vscode8.commands.registerCommand("inkstone.daemon.showMenu", () => manager.showMenu()),
+    vscode8.commands.registerCommand("inkstone.daemon.scan", () => manager.scanWorkspace()),
+    manager
+  );
+}
+
+// src/init/scaffold.ts
+var vscode9 = __toESM(require("vscode"));
 var fs2 = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
 var DIRECTORY_STRUCTURE = [
@@ -2182,7 +2476,7 @@ function getCodemindTemplate() {
 async function scaffoldProject(options) {
   const { tools, workspaceRoot, overwrite } = options;
   if (!overwrite && isProjectInitialized(workspaceRoot)) {
-    const answer = await vscode8.window.showWarningMessage(
+    const answer = await vscode9.window.showWarningMessage(
       "Project appears to be already initialized. Do you want to continue?",
       "Yes, overwrite",
       "Cancel"
@@ -2265,11 +2559,12 @@ async function activate(context) {
   console.log("Inkstone extension is activating...");
   registerSidebarViews(context);
   registerBasicCommands(context);
+  registerDaemonCommands(context);
   const initialized = await extensionStore.initialize();
   if (!initialized) {
     console.log("Inkstone: No codemind.md found in workspace");
     registerFallbackNoteCommands(context);
-    vscode9.window.showInformationMessage(
+    vscode10.window.showInformationMessage(
       'Inkstone: Ready! Run "Inkstone: Initialize Project" to get started.'
     );
     return;
@@ -2289,38 +2584,38 @@ async function activate(context) {
   registerLanguageProviders(context, documentSelector);
   registerNotesTreeView(context);
   registerNoteCommands(context);
-  vscode9.window.showInformationMessage(
+  vscode10.window.showInformationMessage(
     `Inkstone: Found ${extensionStore.getAllNotes().length} notes`
   );
 }
 function registerSidebarViews(context) {
   const memoryProvider = new MemoryTreeProvider();
-  const memoryView = vscode9.window.createTreeView("inkstone-memory", {
+  const memoryView = vscode10.window.createTreeView("inkstone-memory", {
     treeDataProvider: memoryProvider
   });
   const sparcProvider = new SparcTreeProvider();
-  const sparcView = vscode9.window.createTreeView("inkstone-sparc", {
+  const sparcView = vscode10.window.createTreeView("inkstone-sparc", {
     treeDataProvider: sparcProvider
   });
   const swarmProvider = new SwarmTreeProvider();
-  const swarmView = vscode9.window.createTreeView("inkstone-swarm", {
+  const swarmView = vscode10.window.createTreeView("inkstone-swarm", {
     treeDataProvider: swarmProvider
   });
   const vibeCodingProvider = new VibeCodingTreeProvider();
-  const vibeCodingView = vscode9.window.createTreeView("inkstone-vibe-coding", {
+  const vibeCodingView = vscode10.window.createTreeView("inkstone-vibe-coding", {
     treeDataProvider: vibeCodingProvider
   });
   context.subscriptions.push(memoryView, sparcView, swarmView, vibeCodingView);
 }
 function registerBasicCommands(context) {
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.initProject", async () => {
-      const workspaceFolder = vscode9.workspace.workspaceFolders?.[0];
+    vscode10.commands.registerCommand("inkstone.initProject", async () => {
+      const workspaceFolder = vscode10.workspace.workspaceFolders?.[0];
       if (!workspaceFolder) {
-        vscode9.window.showErrorMessage("Inkstone: No workspace folder open");
+        vscode10.window.showErrorMessage("Inkstone: No workspace folder open");
         return;
       }
-      const result = await vscode9.window.showQuickPick(
+      const result = await vscode10.window.showQuickPick(
         [
           { label: "Claude", description: "Initialize with Claude Code settings", picked: true },
           { label: "Gemini", description: "Initialize with Gemini CLI settings" },
@@ -2333,9 +2628,9 @@ function registerBasicCommands(context) {
       );
       if (result && result.length > 0) {
         const tools = result.map((r) => r.label.toLowerCase());
-        await vscode9.window.withProgress(
+        await vscode10.window.withProgress(
           {
-            location: vscode9.ProgressLocation.Notification,
+            location: vscode10.ProgressLocation.Notification,
             title: "Inkstone: Initializing project...",
             cancellable: false
           },
@@ -2346,112 +2641,112 @@ function registerBasicCommands(context) {
             });
           }
         );
-        vscode9.window.showInformationMessage(
+        vscode10.window.showInformationMessage(
           `Inkstone: Project initialized with ${result.map((r) => r.label).join(", ")}`
         );
-        const reloadAnswer = await vscode9.window.showInformationMessage(
+        const reloadAnswer = await vscode10.window.showInformationMessage(
           "Inkstone: Reload window to activate Code-Mind features?",
           "Reload",
           "Later"
         );
         if (reloadAnswer === "Reload") {
-          vscode9.commands.executeCommand("workbench.action.reloadWindow");
+          vscode10.commands.executeCommand("workbench.action.reloadWindow");
         }
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.startVibeCoding", () => {
-      vscode9.window.showInformationMessage("Inkstone: Starting Vibe Coding workflow...");
+    vscode10.commands.registerCommand("inkstone.startVibeCoding", () => {
+      vscode10.window.showInformationMessage("Inkstone: Starting Vibe Coding workflow...");
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.vibeCoding.goToStage", (stage) => {
-      vscode9.window.showInformationMessage(`Inkstone: Going to stage ${stage + 1}...`);
+    vscode10.commands.registerCommand("inkstone.vibeCoding.goToStage", (stage) => {
+      vscode10.window.showInformationMessage(`Inkstone: Going to stage ${stage + 1}...`);
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.saveMemory", async () => {
-      const content = await vscode9.window.showInputBox({
+    vscode10.commands.registerCommand("inkstone.saveMemory", async () => {
+      const content = await vscode10.window.showInputBox({
         prompt: "Enter memory content",
         placeHolder: "What do you want to remember?"
       });
       if (content) {
-        vscode9.window.showInformationMessage(`Inkstone: Memory saved: "${content}"`);
+        vscode10.window.showInformationMessage(`Inkstone: Memory saved: "${content}"`);
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.restoreMemory", () => {
-      vscode9.window.showInformationMessage("Inkstone: Restoring memories...");
+    vscode10.commands.registerCommand("inkstone.restoreMemory", () => {
+      vscode10.window.showInformationMessage("Inkstone: Restoring memories...");
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.searchMemory", async () => {
-      const query = await vscode9.window.showInputBox({
+    vscode10.commands.registerCommand("inkstone.searchMemory", async () => {
+      const query = await vscode10.window.showInputBox({
         prompt: "Search memories",
         placeHolder: "Enter search query..."
       });
       if (query) {
-        vscode9.window.showInformationMessage(`Inkstone: Searching for "${query}"...`);
+        vscode10.window.showInformationMessage(`Inkstone: Searching for "${query}"...`);
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.sparc.architect", async () => {
-      const task = await vscode9.window.showInputBox({
+    vscode10.commands.registerCommand("inkstone.sparc.architect", async () => {
+      const task = await vscode10.window.showInputBox({
         prompt: "Enter architecture task",
         placeHolder: "Design system architecture for..."
       });
       if (task) {
-        const terminal = vscode9.window.createTerminal("SPARC Architect");
+        const terminal = vscode10.window.createTerminal("SPARC Architect");
         terminal.sendText(`claude-flow sparc run architect "${task}"`);
         terminal.show();
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.sparc.coder", async () => {
-      const task = await vscode9.window.showInputBox({
+    vscode10.commands.registerCommand("inkstone.sparc.coder", async () => {
+      const task = await vscode10.window.showInputBox({
         prompt: "Enter coding task",
         placeHolder: "Implement..."
       });
       if (task) {
-        const terminal = vscode9.window.createTerminal("SPARC Coder");
+        const terminal = vscode10.window.createTerminal("SPARC Coder");
         terminal.sendText(`claude-flow sparc run coder "${task}"`);
         terminal.show();
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.sparc.tdd", async () => {
-      const task = await vscode9.window.showInputBox({
+    vscode10.commands.registerCommand("inkstone.sparc.tdd", async () => {
+      const task = await vscode10.window.showInputBox({
         prompt: "Enter TDD task",
         placeHolder: "Write tests for..."
       });
       if (task) {
-        const terminal = vscode9.window.createTerminal("SPARC TDD");
+        const terminal = vscode10.window.createTerminal("SPARC TDD");
         terminal.sendText(`claude-flow sparc run tdd "${task}"`);
         terminal.show();
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.swarm.init", async () => {
-      const topology = await vscode9.window.showQuickPick(
+    vscode10.commands.registerCommand("inkstone.swarm.init", async () => {
+      const topology = await vscode10.window.showQuickPick(
         ["mesh", "hierarchical", "ring", "star"],
         { placeHolder: "Select swarm topology" }
       );
       if (topology) {
-        const terminal = vscode9.window.createTerminal("Swarm Init");
+        const terminal = vscode10.window.createTerminal("Swarm Init");
         terminal.sendText(`claude-flow hive init --topology ${topology}`);
         terminal.show();
       }
     })
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.swarm.status", () => {
-      const terminal = vscode9.window.createTerminal("Swarm Status");
+    vscode10.commands.registerCommand("inkstone.swarm.status", () => {
+      const terminal = vscode10.window.createTerminal("Swarm Status");
       terminal.sendText("claude-flow hive status");
       terminal.show();
     })
@@ -2459,65 +2754,65 @@ function registerBasicCommands(context) {
 }
 function registerFallbackNoteCommands(context) {
   const showWarning = () => {
-    vscode9.window.showWarningMessage(
+    vscode10.window.showWarningMessage(
       'Inkstone: No codemind.md found. Run "Inkstone: Initialize Project" first.'
     );
   };
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.addNote", showWarning),
-    vscode9.commands.registerCommand("inkstone.goToNote", showWarning),
-    vscode9.commands.registerCommand("inkstone.findReferences", showWarning),
-    vscode9.commands.registerCommand("inkstone.refreshNotes", showWarning)
+    vscode10.commands.registerCommand("inkstone.addNote", showWarning),
+    vscode10.commands.registerCommand("inkstone.goToNote", showWarning),
+    vscode10.commands.registerCommand("inkstone.findReferences", showWarning),
+    vscode10.commands.registerCommand("inkstone.refreshNotes", showWarning)
   );
 }
 function registerLanguageProviders(context, documentSelector) {
   context.subscriptions.push(
-    vscode9.languages.registerCompletionItemProvider(
+    vscode10.languages.registerCompletionItemProvider(
       documentSelector,
       new NoteCompletionProvider(),
       "["
     )
   );
   context.subscriptions.push(
-    vscode9.languages.registerHoverProvider(documentSelector, new NoteHoverProvider())
+    vscode10.languages.registerHoverProvider(documentSelector, new NoteHoverProvider())
   );
   context.subscriptions.push(
-    vscode9.languages.registerCodeLensProvider(documentSelector, new NoteCodeLensProvider())
+    vscode10.languages.registerCodeLensProvider(documentSelector, new NoteCodeLensProvider())
   );
   context.subscriptions.push(
-    vscode9.languages.registerDefinitionProvider(documentSelector, new NoteDefinitionProvider())
+    vscode10.languages.registerDefinitionProvider(documentSelector, new NoteDefinitionProvider())
   );
   context.subscriptions.push(
-    vscode9.languages.registerReferenceProvider(documentSelector, new NoteReferenceProvider())
+    vscode10.languages.registerReferenceProvider(documentSelector, new NoteReferenceProvider())
   );
 }
 function registerNotesTreeView(context) {
   const treeProvider = new NoteTreeProvider();
-  const treeView = vscode9.window.createTreeView("inkstone-notes", {
+  const treeView = vscode10.window.createTreeView("inkstone-notes", {
     treeDataProvider: treeProvider,
     showCollapseAll: true
   });
   context.subscriptions.push(
     treeView,
-    vscode9.commands.registerCommand("inkstone.refreshNotes", () => treeProvider.refresh()),
+    vscode10.commands.registerCommand("inkstone.refreshNotes", () => treeProvider.refresh()),
     extensionStore.onDidChange(() => clearHoverCache())
   );
 }
 function registerNoteCommands(context) {
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.addNote", addNoteHandler)
+    vscode10.commands.registerCommand("inkstone.addNote", addNoteHandler)
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.goToNote", goToNoteHandler)
+    vscode10.commands.registerCommand("inkstone.goToNote", goToNoteHandler)
   );
   context.subscriptions.push(
-    vscode9.commands.registerCommand("inkstone.findReferences", findReferencesHandler)
+    vscode10.commands.registerCommand("inkstone.findReferences", findReferencesHandler)
   );
 }
 async function addNoteHandler() {
-  const editor = vscode9.window.activeTextEditor;
+  const editor = vscode10.window.activeTextEditor;
   if (!editor) {
-    vscode9.window.showWarningMessage("No active editor");
+    vscode10.window.showWarningMessage("No active editor");
     return;
   }
   const selection = editor.selection;
@@ -2525,7 +2820,7 @@ async function addNoteHandler() {
   if (!selection.isEmpty) {
     content = editor.document.getText(selection);
   } else {
-    content = await vscode9.window.showInputBox({
+    content = await vscode10.window.showInputBox({
       prompt: "Enter note content",
       placeHolder: "Note content..."
     }) || "";
@@ -2536,14 +2831,14 @@ async function addNoteHandler() {
   const filePath = getRelativeFilePath(editor.document.uri.fsPath);
   const note = extensionStore.addNote(filePath, content);
   if (note) {
-    vscode9.window.showInformationMessage(`Created note: [[${note.properties.id}]]`);
+    vscode10.window.showInformationMessage(`Created note: [[${note.properties.id}]]`);
     if (selection.isEmpty) {
       editor.edit((editBuilder) => {
         editBuilder.insert(selection.active, `[[${note.properties.id}|${note.displayPath}]]`);
       });
     }
   } else {
-    vscode9.window.showErrorMessage("Failed to create note");
+    vscode10.window.showErrorMessage("Failed to create note");
   }
 }
 async function goToNoteHandler(noteId) {
@@ -2555,7 +2850,7 @@ async function goToNoteHandler(noteId) {
       detail: note.content[0]?.content || "No content",
       noteId: note.properties.id
     }));
-    const selected = await vscode9.window.showQuickPick(items, {
+    const selected = await vscode10.window.showQuickPick(items, {
       placeHolder: "Select a note to go to",
       matchOnDescription: true,
       matchOnDetail: true
@@ -2567,19 +2862,19 @@ async function goToNoteHandler(noteId) {
   }
   const location = await getNoteDefinitionLocation(noteId);
   if (location) {
-    const document = await vscode9.workspace.openTextDocument(location.uri);
-    const editor = await vscode9.window.showTextDocument(document);
-    editor.selection = new vscode9.Selection(location.range.start, location.range.start);
-    editor.revealRange(location.range, vscode9.TextEditorRevealType.InCenter);
+    const document = await vscode10.workspace.openTextDocument(location.uri);
+    const editor = await vscode10.window.showTextDocument(document);
+    editor.selection = new vscode10.Selection(location.range.start, location.range.start);
+    editor.revealRange(location.range, vscode10.TextEditorRevealType.InCenter);
   } else {
-    vscode9.window.showWarningMessage(`Note not found: ${noteId}`);
+    vscode10.window.showWarningMessage(`Note not found: ${noteId}`);
   }
 }
 async function findReferencesHandler(noteId) {
   if (!noteId) {
-    const editor2 = vscode9.window.activeTextEditor;
+    const editor2 = vscode10.window.activeTextEditor;
     if (!editor2) {
-      vscode9.window.showWarningMessage("No active editor");
+      vscode10.window.showWarningMessage("No active editor");
       return;
     }
     const position = editor2.selection.active;
@@ -2601,7 +2896,7 @@ async function findReferencesHandler(noteId) {
         description: `${note.properties.backlink_count || 0} references`,
         noteId: note.properties.id
       }));
-      const selected = await vscode9.window.showQuickPick(items, {
+      const selected = await vscode10.window.showQuickPick(items, {
         placeHolder: "Select a note to find references"
       });
       if (!selected) {
@@ -2612,12 +2907,12 @@ async function findReferencesHandler(noteId) {
   }
   const locations = await findNoteReferences(noteId);
   if (locations.length === 0) {
-    vscode9.window.showInformationMessage(`No references found for ${noteId}`);
+    vscode10.window.showInformationMessage(`No references found for ${noteId}`);
     return;
   }
-  const editor = vscode9.window.activeTextEditor;
+  const editor = vscode10.window.activeTextEditor;
   if (editor) {
-    await vscode9.commands.executeCommand(
+    await vscode10.commands.executeCommand(
       "editor.action.peekLocations",
       editor.document.uri,
       editor.selection.active,
