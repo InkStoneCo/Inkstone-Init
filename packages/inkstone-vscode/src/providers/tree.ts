@@ -42,7 +42,7 @@ export class NoteTreeItem extends vscode.TreeItem {
     // Set command for notes
     if (itemType === 'note' && noteId) {
       this.command = {
-        command: 'codemind.goToNote',
+        command: 'inkstone.goToNote',
         title: 'Go to Note',
         arguments: [noteId],
       };
