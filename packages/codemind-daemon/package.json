@@ -1,5 +1,5 @@
 {
-  "name": "@uncle6/codemind-daemon",
+  "name": "@inkstone/codemind-daemon",
   "version": "0.1.0",
   "description": "File watcher daemon for Code-Mind",
   "type": "module",
@@ -27,7 +27,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@uncle6/codemind-core": "*",
+    "@inkstone/codemind-core": "*",
     "chokidar": "^3.5.3"
   },
   "devDependencies": {
@@ -37,6 +37,7 @@
     "vitest": "^1.0.0"
   },
   "keywords": [
+    "inkstone",
     "codemind",
     "daemon",
     "file-watcher"
