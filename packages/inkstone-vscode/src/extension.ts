@@ -21,6 +21,7 @@ import {
   VibeCodingTreeProvider,
   clearHoverCache,
 } from './providers/index.js';
+import { registerDaemonCommands } from './daemon-manager.js';
 import { scaffoldProject, type AITool } from './init/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
