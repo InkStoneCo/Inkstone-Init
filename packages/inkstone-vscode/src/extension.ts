@@ -44,6 +44,9 @@ export async function activate(context: vscode.ExtensionContext) {
   // Register basic commands (always available)
   registerBasicCommands(context);
 
+  // Register Daemon commands (always available)
+  registerDaemonCommands(context);
+
   // Initialize the note store
   const initialized = await extensionStore.initialize();
   if (!initialized) {
