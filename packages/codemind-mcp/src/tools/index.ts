@@ -8,7 +8,7 @@ import {
   type Note,
   type SearchResult,
   type RelatedNote,
-} from '@uncle6/codemind-core';
+} from '@inkstone/codemind-core';
 
 /**
  * 筆記詳情
