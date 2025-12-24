@@ -175,7 +175,16 @@ describe('createProcessor', () => {
       expect(result.changes[0]?.type).toBe('create');
       expect(result.changes[0]?.content).toBe('Important note');
       expect(result.newContent).toContain('[[cm.new0|test.ts/new0]]');
-      expect(result.newContent).not.toContain('[[cm.1molk3|packages/daemon/src/processor.test.ts/1molk3]] and [[cm.16silf|packages/daemon/src/processor.test.ts/16silf]]';
+      expect(result.newContent).not.toContain('{{cm:');
+    });
+
+    it('should process multiple new note markers', () => {
+      let idCounter = 0;
+      const processor = createProcessor({
+        generateId: () => `cm.m${idCounter++}` as NoteId,
+      });
+
+      const content = '{{cm: Note 1}} and {{cm: Note 2}}';
       const result = processor.processFile('test.ts', content);
 
       expect(result.modified).toBe(true);
