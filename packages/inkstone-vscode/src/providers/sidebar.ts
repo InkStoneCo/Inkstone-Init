@@ -8,14 +8,17 @@ import * as vscode from 'vscode';
  */
 export class ActionItem extends vscode.TreeItem {
   constructor(
-    public readonly label: string,
-    public readonly command: vscode.Command,
-    public readonly description?: string,
-    public readonly icon?: string
+    label: string,
+    command: vscode.Command,
+    tooltip?: string,
+    icon?: string
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
-    this.tooltip = description || label;
-    this.iconPath = icon ? new vscode.ThemeIcon(icon) : undefined;
+    this.command = command;
+    this.tooltip = tooltip || label;
+    if (icon) {
+      this.iconPath = new vscode.ThemeIcon(icon);
+    }
   }
 }
 
