@@ -3,7 +3,7 @@
 
 import * as vscode from 'vscode';
 import { extensionStore } from '../store.js';
-import type { Note, NoteId } from '@uncle6/codemind-core';
+import type { Note, NoteId } from '@inkstone/codemind-core';
 
 /**
  * Tree item types
