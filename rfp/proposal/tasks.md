@@ -647,7 +647,7 @@
 | Sprint 1 | Extension + Sidebar | 安裝、面板顯示 | ✅ 完成 |
 | Sprint 2 | Init 模組 | 一鍵初始化 | ✅ 完成 |
 | Sprint 3 | 筆記核心 | 右鍵插入、TreeView、Daemon | ✅ 完成 |
-| Sprint 4 | 筆記進階 | 自動補全、跳轉 | 🔜 待開始 |
+| Sprint 4 | 筆記進階 | 自動補全、跳轉 | ✅ 完成 |
 | Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 | 🔜 待開始 |
 | Sprint 6 | SPARC 模式 | 按鈕執行指令 | 🔜 待開始 |
 | Sprint 7 | Swarm 協調 | 初始化、監控 | 🔜 待開始 |
