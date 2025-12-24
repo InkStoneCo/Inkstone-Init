@@ -23,6 +23,7 @@ import {
 } from './providers/index.js';
 import { registerDaemonCommands } from './daemon-manager.js';
 import { scaffoldProject, type AITool } from './init/index.js';
+import { saveMemoryHandler, restoreMemoryHandler, searchMemoryHandler } from './memory/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
