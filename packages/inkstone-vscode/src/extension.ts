@@ -123,6 +123,12 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
   // Init Project
   context.subscriptions.push(
     vscode.commands.registerCommand('inkstone.initProject', async () => {
+      const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+      if (!workspaceFolder) {
+        vscode.window.showErrorMessage('Inkstone: No workspace folder open');
+        return;
+      }
+
       const result = await vscode.window.showQuickPick(
         [
           { label: 'Claude', description: 'Initialize with Claude Code settings', picked: true },
@@ -136,10 +142,35 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
       );
 
       if (result && result.length > 0) {
+        const tools: AITool[] = result.map(r => r.label.toLowerCase() as AITool);
+
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Inkstone: Initializing project...',
+            cancellable: false,
+          },
+          async () => {
+            await scaffoldProject({
+              tools,
+              workspaceRoot: workspaceFolder.uri.fsPath,
+            });
+          }
+        );
+
         vscode.window.showInformationMessage(
           `Inkstone: Project initialized with ${result.map(r => r.label).join(', ')}`
         );
-        // TODO: Implement actual initialization in Sprint 2
+
+        // Reload the extension to pick up new codemind.md
+        const reloadAnswer = await vscode.window.showInformationMessage(
+          'Inkstone: Reload window to activate Code-Mind features?',
+          'Reload',
+          'Later'
+        );
+        if (reloadAnswer === 'Reload') {
+          vscode.commands.executeCommand('workbench.action.reloadWindow');
+        }
       }
     })
   );
