@@ -160,41 +160,47 @@
 
 ### 任務 3.1: 筆記儲存層
 
-- [ ] **3.1.1 codemind.md 解析器**
-  - 實作 Markdown 解析邏輯
-  - 定義筆記資料結構 (Note interface)
-  - 實作雙向連結識別
+- [x] **3.1.1 codemind.md 解析器** ✅ 2024-12-24
+  - 實作 Markdown 解析邏輯（支援新舊兩種格式）
+  - 定義筆記資料結構 (Note, NoteId, NoteProperties interface)
+  - 實作雙向連結識別（extractReferences）
+  - 檔案：`packages/codemind-core/src/parser/index.ts`
   - _需求: Story 2.4_
 
-- [ ] **3.1.2 筆記儲存 (NoteStore)**
-  - 實作 CRUD 操作
-  - 實作搜尋功能
-  - 實作自動儲存
+- [x] **3.1.2 筆記儲存 (NoteStore)** ✅ 2024-12-24
+  - 實作 CRUD 操作（add, update, delete, get）
+  - 實作搜尋功能（search, getOrphans, getPopular）
+  - 實作自動儲存與 BacklinkManager
+  - 檔案：`packages/codemind-core/src/store/index.ts`
   - _需求: Story 2.1, Story 5.3_
 
 ### 任務 3.2: 右鍵選單
 
-- [ ] **3.2.1 Add Note 選單**
-  - 註冊 editor/context 選單
+- [x] **3.2.1 Add Note 選單** ✅ 2024-12-24
+  - 註冊 editor/context 選單（package.json menus）
   - 實作選取文字處理
   - 顯示標題輸入對話框
   - 自動生成 ID 並插入引用
+  - 快捷鍵：`Cmd/Ctrl+Shift+M`
   - _需求: Story 2.1_
 
 ### 任務 3.3: 筆記 TreeView
 
-- [ ] **3.3.1 Notes 區塊子節點**
-  - 實作按檔案分組顯示
-  - 實作點擊跳轉功能
-  - 實作即時刷新
+- [x] **3.3.1 Notes 區塊子節點** ✅ 2024-12-24
+  - 實作按檔案分組顯示（All Notes, Current File, Orphans, Popular）
+  - 實作點擊跳轉功能（goToNote command）
+  - 實作即時刷新（onDidChangeTreeData）
+  - 檔案：`packages/inkstone-vscode/src/providers/tree.ts`
   - _需求: Story 2.3_
 
 ### 任務 3.4: Daemon 管理
 
-- [ ] **3.4.1 DaemonManager 實作**
-  - 實作 Daemon 狀態檢查
-  - 實作自動啟動邏輯
-  - 實作狀態列顯示
+- [x] **3.4.1 DaemonManager 實作** ✅ 2024-12-24
+  - 實作 Daemon 狀態檢查（stopped/starting/running/error）
+  - 實作自動啟動邏輯與操作選單
+  - 實作狀態列顯示與 OutputChannel 日誌
+  - 新增指令：start, stop, restart, showMenu, scan
+  - 檔案：`packages/inkstone-vscode/src/daemon-manager.ts`
   - _需求: Story 2.5_
 
 ### 測試交付
