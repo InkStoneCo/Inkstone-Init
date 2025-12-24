@@ -629,10 +629,10 @@
 
 ## 總結
 
-| Sprint | 主要交付物 | 可測試功能 |
-|--------|-----------|-----------|
-| Sprint 0 | Monorepo 結構 | 開發環境 |
-| Sprint 1 | Extension + Sidebar | 安裝、面板顯示 |
+| Sprint | 主要交付物 | 可測試功能 | 狀態 |
+|--------|-----------|-----------|------|
+| Sprint 0 | Monorepo 結構 | 開發環境 | ✅ 完成 |
+| Sprint 1 | Extension + Sidebar | 安裝、面板顯示 | ✅ 完成 |
 | Sprint 2 | Init 模組 | 一鍵初始化 |
 | Sprint 3 | 筆記核心 | 右鍵插入、TreeView |
 | Sprint 4 | 筆記進階 | 自動補全、跳轉 |
