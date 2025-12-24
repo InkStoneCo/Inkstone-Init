@@ -3,7 +3,7 @@
 
 import * as vscode from 'vscode';
 import { extensionStore, NOTE_REFERENCE_PATTERN } from '../store.js';
-import type { NoteId } from '@uncle6/codemind-core';
+import type { NoteId } from '@inkstone/codemind-core';
 
 /**
  * 筆記 CodeLens 提供者
