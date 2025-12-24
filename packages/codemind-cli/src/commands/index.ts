@@ -8,8 +8,8 @@ import {
   type NoteStore,
   type Note,
   type NoteId,
-} from '@uncle6/codemind-core';
-import { createDaemon, type Daemon, type DaemonStatus } from '@uncle6/codemind-daemon';
+} from '@inkstone/codemind-core';
+import { createDaemon, type Daemon, type DaemonStatus } from '@inkstone/codemind-daemon';
 import {
   output,
   ensureCodemindExists,
