@@ -3,7 +3,7 @@
 
 import * as vscode from 'vscode';
 import { extensionStore, getNoteReferenceAtPosition } from '../store.js';
-import type { NoteId } from '@uncle6/codemind-core';
+import type { NoteId } from '@inkstone/codemind-core';
 
 /**
  * Simple cache for hover content
