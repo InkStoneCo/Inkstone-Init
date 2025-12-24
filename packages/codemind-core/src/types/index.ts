@@ -18,10 +18,16 @@ export type NotePath = string;
 export type NoteAuthor = 'human' | 'ai';
 
 /**
+ * 筆記類型
+ */
+export type NoteType = 'note' | 'memory';
+
+/**
  * 筆記屬性
  */
 export interface NoteProperties {
   id: NoteId;
+  type?: NoteType;
   file?: string;
   line?: number;
   author: NoteAuthor;
@@ -30,6 +36,10 @@ export interface NoteProperties {
   related?: NoteId[];
   backlinks?: NoteId[];
   backlink_count?: number;
+  /** Memory 專用：標題 */
+  title?: string;
+  /** Memory 專用：標籤 */
+  tags?: string[];
 }
 
 /**
