@@ -359,7 +359,7 @@ export function createNoteStore(codemindPath: string, options: NoteStoreOptions 
 
     // === 修改 ===
 
-    addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId): Note {
+    addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId, extraProperties?: Partial<NoteProperties>): Note {
       // 使用提供的 ID 或產生新 ID (確保唯一)
       let newId: NoteId;
       if (noteId && !notesMap.has(noteId)) {
@@ -376,7 +376,11 @@ export function createNoteStore(codemindPath: string, options: NoteStoreOptions 
         file,
         author: 'human',
         created: new Date().toISOString().split('T')[0] || '',
+        ...extraProperties, // 合併額外屬性
       };
+
+      // 確保 ID 不被覆蓋
+      properties.id = newId;
 
       if (parentId) {
         properties.parent = parentId;
