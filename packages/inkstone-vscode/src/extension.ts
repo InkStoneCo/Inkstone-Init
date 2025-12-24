@@ -17,7 +17,7 @@ import {
   NoteTreeProvider,
   clearHoverCache,
 } from './providers/index.js';
-import type { NoteId } from '@uncle6/codemind-core';
+import type { NoteId } from '@inkstone/codemind-core';
 
 /**
  * Quick pick item with note ID
