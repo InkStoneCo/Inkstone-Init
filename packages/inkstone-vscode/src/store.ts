@@ -3,7 +3,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { createNoteStore, type NoteStore, type Note, type NoteId } from '@inkstone/codemind-core';
+import { createNoteStore, type NoteStore, type Note, type NoteId, type NoteProperties } from '@inkstone/codemind-core';
 
 /**
  * Extension store manager
