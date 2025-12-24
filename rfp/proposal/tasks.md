@@ -107,15 +107,15 @@
 
 ### 任務 2.1: Init 模組
 
-- [ ] **2.1.1 目錄結構生成**
+- [x] **2.1.1 目錄結構生成** ✅ 2024-12-24
   - 實作 `scaffold.ts` 目錄生成邏輯
   - 建立 `requirements/initial/rfp/` 結構
   - 建立 `requirements/initial/proposal/` 結構
   - 建立 `requirements/initial/rfp/Gherkin/` 目錄
   - _需求: Story 3.2_
 
-- [ ] **2.1.2 設定檔模板系統**
-  - 建立 `templates/` 目錄
+- [x] **2.1.2 設定檔模板系統** ✅ 2024-12-24
+  - 內嵌模板函數（getClaudeSettingsTemplate, getClaudeMdTemplate, getGeminiConfigTemplate, getAgentsMdTemplate）
   - 準備 Claude 設定模板（`.claude/settings.json`, `CLAUDE.md`）
   - 準備 Gemini 設定模板（`.gemini/config.yaml`）
   - 準備 Codex 設定模板（`AGENTS.md`）
