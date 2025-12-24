@@ -130,29 +130,22 @@ describe('Parser.parse', () => {
 
   it('should parse a complete codemind.md', () => {
     const parser = createParser();
-    const content = `
-- # CodeMind
-  id:: project-root
-  type:: project
-  name:: Test Project
-  created:: 2024-12-01
-- [[cm.abc123]]
-  id:: cm.abc123
-  file:: main.py
-  line:: 15
-  author:: human
-  created:: 2024-12-01
-  - This is the note content
-  - Second line of content
-- [[cm.def456]]
-  id:: cm.def456
-  file:: utils.py
-  line:: 30
-  author:: ai
-  created:: 2024-12-02
-  related:: [[cm.abc123]]
-  - Utils note content
-  - Uses [[cm.abc123]] for reference
+    // 使用新格式：Bullet + Indent
+    const content = `# Code-Mind Notes
+- Project: Test Project
+- Created: 2024-12-01
+
+- ## main.py
+  - [[cm.abc123]]
+    - human · 2024-12-01 · line 15
+    - This is the note content
+    - Second line of content
+
+- ## utils.py
+  - [[cm.def456]]
+    - ai · 2024-12-02 · line 30
+    - Utils note content
+    - Uses [[cm.abc123]] for reference
 `.trim();
 
     const result = parser.parse(content);
@@ -174,9 +167,10 @@ describe('Parser.parse', () => {
 
     const note2 = result.notes.get('cm.def456' as NoteId);
     expect(note2).toBeDefined();
-    expect(note2?.properties.related).toEqual(['cm.abc123' as NoteId]);
+    // 新格式從內容中提取 related，不使用屬性
+    expect(note2?.content.length).toBe(2);
 
-    // Check forward links
+    // Check forward links (從內容中的 [[cm.abc123]] 引用)
     expect(result.forwardLinks.get('cm.def456' as NoteId)).toContain('cm.abc123');
 
     // Check backward links
