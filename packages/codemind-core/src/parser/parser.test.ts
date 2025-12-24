@@ -215,18 +215,18 @@ describe('Parser.parse', () => {
 
   it('should parse nested child notes', () => {
     const parser = createParser();
-    const content = `
-- [[cm.parent]]
-  id:: cm.parent
-  author:: human
-  created:: 2024-12-01
-  - Parent content
-  - [[cm.child]]
-    id:: cm.child
-    author:: human
-    created:: 2024-12-01
-    parent:: cm.parent
-    - Child content
+    // 使用新格式：Bullet + Indent
+    const content = `# Code-Mind Notes
+- Project: Test
+- Created: 2024-12-01
+
+- ## test.ts
+  - [[cm.parent]]
+    - human · 2024-12-01
+    - Parent content
+    - [[cm.child]]
+      - human · 2024-12-01
+      - Child content
 `.trim();
 
     const result = parser.parse(content);
