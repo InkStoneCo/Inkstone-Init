@@ -1,5 +1,5 @@
-// VSCode Extension entry point
-// Phase 5.1 實作
+// Inkstone VSCode Extension entry point
+// Sprint 1 實作
 
 import * as vscode from 'vscode';
 import {
@@ -15,6 +15,10 @@ import {
   NoteDefinitionProvider,
   NoteReferenceProvider,
   NoteTreeProvider,
+  MemoryTreeProvider,
+  SparcTreeProvider,
+  SwarmTreeProvider,
+  VibeCodingTreeProvider,
   clearHoverCache,
 } from './providers/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
@@ -30,18 +34,27 @@ interface NoteQuickPickItem extends vscode.QuickPickItem {
  * Extension activation
  */
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('Code-Mind extension is activating...');
+  console.log('Inkstone extension is activating...');
 
-  // Initialize the store
+  // Register sidebar TreeViews (always available)
+  registerSidebarViews(context);
+
+  // Register basic commands (always available)
+  registerBasicCommands(context);
+
+  // Initialize the note store
   const initialized = await extensionStore.initialize();
   if (!initialized) {
-    console.log('Code-Mind: No codemind.md found in workspace');
-    // Still register commands but show warning when used
-    registerFallbackCommands(context);
+    console.log('Inkstone: No codemind.md found in workspace');
+    // Register fallback commands for notes
+    registerFallbackNoteCommands(context);
+    vscode.window.showInformationMessage(
+      'Inkstone: Ready! Run "Inkstone: Initialize Project" to get started.'
+    );
     return;
   }
 
-  console.log('Code-Mind extension is now active');
+  console.log('Inkstone extension is now active with Code-Mind support');
 
   // Document selector for all supported file types
   const documentSelector: vscode.DocumentSelector = [
@@ -56,94 +69,286 @@ export async function activate(context: vscode.ExtensionContext) {
     { scheme: 'file', language: 'java' },
   ];
 
-  // Register Completion Provider
-  const completionProvider = vscode.languages.registerCompletionItemProvider(
-    documentSelector,
-    new NoteCompletionProvider(),
-    '[' // Trigger on [
-  );
+  // Register language providers
+  registerLanguageProviders(context, documentSelector);
 
-  // Register Hover Provider
-  const hoverProvider = vscode.languages.registerHoverProvider(
-    documentSelector,
-    new NoteHoverProvider()
-  );
+  // Register Notes TreeView
+  registerNotesTreeView(context);
 
-  // Register CodeLens Provider
-  const codeLensProvider = vscode.languages.registerCodeLensProvider(
-    documentSelector,
-    new NoteCodeLensProvider()
-  );
-
-  // Register Definition Provider
-  const definitionProvider = vscode.languages.registerDefinitionProvider(
-    documentSelector,
-    new NoteDefinitionProvider()
-  );
-
-  // Register Reference Provider
-  const referenceProvider = vscode.languages.registerReferenceProvider(
-    documentSelector,
-    new NoteReferenceProvider()
-  );
-
-  // Register Tree View
-  const treeProvider = new NoteTreeProvider();
-  const treeView = vscode.window.createTreeView('codemind-notes', {
-    treeDataProvider: treeProvider,
-    showCollapseAll: true,
-  });
-
-  // Register Commands
-  const addNoteCommand = vscode.commands.registerCommand('codemind.addNote', addNoteHandler);
-
-  const goToNoteCommand = vscode.commands.registerCommand('codemind.goToNote', goToNoteHandler);
-
-  const findReferencesCommand = vscode.commands.registerCommand(
-    'codemind.findReferences',
-    findReferencesHandler
-  );
-
-  const refreshTreeCommand = vscode.commands.registerCommand('codemind.refreshTree', () =>
-    treeProvider.refresh()
-  );
-
-  // Subscribe all disposables
-  context.subscriptions.push(
-    completionProvider,
-    hoverProvider,
-    codeLensProvider,
-    definitionProvider,
-    referenceProvider,
-    treeView,
-    addNoteCommand,
-    goToNoteCommand,
-    findReferencesCommand,
-    refreshTreeCommand,
-    // Cleanup on store change
-    extensionStore.onDidChange(() => clearHoverCache())
-  );
+  // Register note commands
+  registerNoteCommands(context);
 
   // Show welcome message
   vscode.window.showInformationMessage(
-    `Code-Mind: Found ${extensionStore.getAllNotes().length} notes`
+    `Inkstone: Found ${extensionStore.getAllNotes().length} notes`
   );
 }
 
 /**
- * Register fallback commands when no codemind.md is found
+ * Register sidebar TreeViews
  */
-function registerFallbackCommands(context: vscode.ExtensionContext) {
+function registerSidebarViews(context: vscode.ExtensionContext) {
+  // Memory TreeView
+  const memoryProvider = new MemoryTreeProvider();
+  const memoryView = vscode.window.createTreeView('inkstone-memory', {
+    treeDataProvider: memoryProvider,
+  });
+
+  // SPARC TreeView
+  const sparcProvider = new SparcTreeProvider();
+  const sparcView = vscode.window.createTreeView('inkstone-sparc', {
+    treeDataProvider: sparcProvider,
+  });
+
+  // Swarm TreeView
+  const swarmProvider = new SwarmTreeProvider();
+  const swarmView = vscode.window.createTreeView('inkstone-swarm', {
+    treeDataProvider: swarmProvider,
+  });
+
+  // Vibe Coding TreeView
+  const vibeCodingProvider = new VibeCodingTreeProvider();
+  const vibeCodingView = vscode.window.createTreeView('inkstone-vibe-coding', {
+    treeDataProvider: vibeCodingProvider,
+  });
+
+  context.subscriptions.push(memoryView, sparcView, swarmView, vibeCodingView);
+}
+
+/**
+ * Register basic commands (always available)
+ */
+function registerBasicCommands(context: vscode.ExtensionContext) {
+  // Init Project
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.initProject', async () => {
+      const result = await vscode.window.showQuickPick(
+        [
+          { label: 'Claude', description: 'Initialize with Claude Code settings', picked: true },
+          { label: 'Gemini', description: 'Initialize with Gemini CLI settings' },
+          { label: 'Codex', description: 'Initialize with OpenAI Codex settings' },
+        ],
+        {
+          placeHolder: 'Select AI tools to configure',
+          canPickMany: true,
+        }
+      );
+
+      if (result && result.length > 0) {
+        vscode.window.showInformationMessage(
+          `Inkstone: Project initialized with ${result.map(r => r.label).join(', ')}`
+        );
+        // TODO: Implement actual initialization in Sprint 2
+      }
+    })
+  );
+
+  // Start Vibe Coding
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.startVibeCoding', () => {
+      vscode.window.showInformationMessage('Inkstone: Starting Vibe Coding workflow...');
+      // TODO: Implement in Sprint 8
+    })
+  );
+
+  // Vibe Coding go to stage
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.vibeCoding.goToStage', (stage: number) => {
+      vscode.window.showInformationMessage(`Inkstone: Going to stage ${stage + 1}...`);
+      // TODO: Implement in Sprint 8
+    })
+  );
+
+  // Memory commands
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.saveMemory', async () => {
+      const content = await vscode.window.showInputBox({
+        prompt: 'Enter memory content',
+        placeHolder: 'What do you want to remember?',
+      });
+      if (content) {
+        vscode.window.showInformationMessage(`Inkstone: Memory saved: "${content}"`);
+        // TODO: Implement in Sprint 5
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.restoreMemory', () => {
+      vscode.window.showInformationMessage('Inkstone: Restoring memories...');
+      // TODO: Implement in Sprint 5
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.searchMemory', async () => {
+      const query = await vscode.window.showInputBox({
+        prompt: 'Search memories',
+        placeHolder: 'Enter search query...',
+      });
+      if (query) {
+        vscode.window.showInformationMessage(`Inkstone: Searching for "${query}"...`);
+        // TODO: Implement in Sprint 5
+      }
+    })
+  );
+
+  // SPARC commands
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.sparc.architect', async () => {
+      const task = await vscode.window.showInputBox({
+        prompt: 'Enter architecture task',
+        placeHolder: 'Design system architecture for...',
+      });
+      if (task) {
+        const terminal = vscode.window.createTerminal('SPARC Architect');
+        terminal.sendText(`claude-flow sparc run architect "${task}"`);
+        terminal.show();
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.sparc.coder', async () => {
+      const task = await vscode.window.showInputBox({
+        prompt: 'Enter coding task',
+        placeHolder: 'Implement...',
+      });
+      if (task) {
+        const terminal = vscode.window.createTerminal('SPARC Coder');
+        terminal.sendText(`claude-flow sparc run coder "${task}"`);
+        terminal.show();
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.sparc.tdd', async () => {
+      const task = await vscode.window.showInputBox({
+        prompt: 'Enter TDD task',
+        placeHolder: 'Write tests for...',
+      });
+      if (task) {
+        const terminal = vscode.window.createTerminal('SPARC TDD');
+        terminal.sendText(`claude-flow sparc run tdd "${task}"`);
+        terminal.show();
+      }
+    })
+  );
+
+  // Swarm commands
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.swarm.init', async () => {
+      const topology = await vscode.window.showQuickPick(
+        ['mesh', 'hierarchical', 'ring', 'star'],
+        { placeHolder: 'Select swarm topology' }
+      );
+      if (topology) {
+        const terminal = vscode.window.createTerminal('Swarm Init');
+        terminal.sendText(`claude-flow hive init --topology ${topology}`);
+        terminal.show();
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.swarm.status', () => {
+      const terminal = vscode.window.createTerminal('Swarm Status');
+      terminal.sendText('claude-flow hive status');
+      terminal.show();
+    })
+  );
+}
+
+/**
+ * Register fallback note commands when no codemind.md is found
+ */
+function registerFallbackNoteCommands(context: vscode.ExtensionContext) {
   const showWarning = () => {
     vscode.window.showWarningMessage(
-      'Code-Mind: No codemind.md found. Run "codemind init" in terminal.'
+      'Inkstone: No codemind.md found. Run "Inkstone: Initialize Project" first.'
     );
   };
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('codemind.addNote', showWarning),
-    vscode.commands.registerCommand('codemind.goToNote', showWarning),
-    vscode.commands.registerCommand('codemind.findReferences', showWarning)
+    vscode.commands.registerCommand('inkstone.addNote', showWarning),
+    vscode.commands.registerCommand('inkstone.goToNote', showWarning),
+    vscode.commands.registerCommand('inkstone.findReferences', showWarning),
+    vscode.commands.registerCommand('inkstone.refreshNotes', showWarning)
+  );
+}
+
+/**
+ * Register language providers for Code-Mind features
+ */
+function registerLanguageProviders(
+  context: vscode.ExtensionContext,
+  documentSelector: vscode.DocumentSelector
+) {
+  // Completion Provider
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      documentSelector,
+      new NoteCompletionProvider(),
+      '['
+    )
+  );
+
+  // Hover Provider
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider(documentSelector, new NoteHoverProvider())
+  );
+
+  // CodeLens Provider
+  context.subscriptions.push(
+    vscode.languages.registerCodeLensProvider(documentSelector, new NoteCodeLensProvider())
+  );
+
+  // Definition Provider
+  context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(documentSelector, new NoteDefinitionProvider())
+  );
+
+  // Reference Provider
+  context.subscriptions.push(
+    vscode.languages.registerReferenceProvider(documentSelector, new NoteReferenceProvider())
+  );
+}
+
+/**
+ * Register Notes TreeView
+ */
+function registerNotesTreeView(context: vscode.ExtensionContext) {
+  const treeProvider = new NoteTreeProvider();
+  const treeView = vscode.window.createTreeView('inkstone-notes', {
+    treeDataProvider: treeProvider,
+    showCollapseAll: true,
+  });
+
+  context.subscriptions.push(
+    treeView,
+    vscode.commands.registerCommand('inkstone.refreshNotes', () => treeProvider.refresh()),
+    extensionStore.onDidChange(() => clearHoverCache())
+  );
+}
+
+/**
+ * Register note commands
+ */
+function registerNoteCommands(context: vscode.ExtensionContext) {
+  // Add Note
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.addNote', addNoteHandler)
+  );
+
+  // Go to Note
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.goToNote', goToNoteHandler)
+  );
+
+  // Find References
+  context.subscriptions.push(
+    vscode.commands.registerCommand('inkstone.findReferences', findReferencesHandler)
   );
 }
 
@@ -157,14 +362,12 @@ async function addNoteHandler() {
     return;
   }
 
-  // Get the content to use for the note
   const selection = editor.selection;
   let content = '';
 
   if (!selection.isEmpty) {
     content = editor.document.getText(selection);
   } else {
-    // Prompt for content
     content =
       (await vscode.window.showInputBox({
         prompt: 'Enter note content',
@@ -176,15 +379,12 @@ async function addNoteHandler() {
     return;
   }
 
-  // Get the file path
   const filePath = getRelativeFilePath(editor.document.uri.fsPath);
-
-  // Add the note
   const note = extensionStore.addNote(filePath, content);
+
   if (note) {
     vscode.window.showInformationMessage(`Created note: [[${note.properties.id}]]`);
 
-    // Insert reference at cursor if no selection
     if (selection.isEmpty) {
       editor.edit(editBuilder => {
         editBuilder.insert(selection.active, `[[${note.properties.id}|${note.displayPath}]]`);
@@ -199,7 +399,6 @@ async function addNoteHandler() {
  * Go to Note command handler
  */
 async function goToNoteHandler(noteId?: NoteId) {
-  // If no ID provided, show quick pick
   if (!noteId) {
     const notes = extensionStore.getAllNotes();
     const items: NoteQuickPickItem[] = notes.map(note => ({
@@ -222,7 +421,6 @@ async function goToNoteHandler(noteId?: NoteId) {
     noteId = selected.noteId;
   }
 
-  // Navigate to the note definition
   const location = await getNoteDefinitionLocation(noteId);
   if (location) {
     const document = await vscode.workspace.openTextDocument(location.uri);
@@ -238,7 +436,6 @@ async function goToNoteHandler(noteId?: NoteId) {
  * Find References command handler
  */
 async function findReferencesHandler(noteId?: NoteId) {
-  // If no ID provided, try to get from cursor position
   if (!noteId) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -246,7 +443,6 @@ async function findReferencesHandler(noteId?: NoteId) {
       return;
     }
 
-    // Try to find note ID at cursor
     const position = editor.selection.active;
     const line = editor.document.lineAt(position.line).text;
     const pattern = /\[\[(cm\.[a-z0-9]+)(?:\|[^\]]+)?\]\]/g;
@@ -262,7 +458,6 @@ async function findReferencesHandler(noteId?: NoteId) {
     }
 
     if (!noteId) {
-      // Show quick pick to select a note
       const notes = extensionStore.getAllNotes();
       const items: NoteQuickPickItem[] = notes.map(note => ({
         label: note.displayPath,
@@ -282,7 +477,6 @@ async function findReferencesHandler(noteId?: NoteId) {
     }
   }
 
-  // Find all references
   const locations = await findNoteReferences(noteId);
 
   if (locations.length === 0) {
@@ -290,7 +484,6 @@ async function findReferencesHandler(noteId?: NoteId) {
     return;
   }
 
-  // Show peek view with references
   const editor = vscode.window.activeTextEditor;
   if (editor) {
     await vscode.commands.executeCommand(
@@ -307,7 +500,7 @@ async function findReferencesHandler(noteId?: NoteId) {
  * Extension deactivation
  */
 export function deactivate() {
-  console.log('Code-Mind extension is deactivating...');
+  console.log('Inkstone extension is deactivating...');
   extensionStore.dispose();
-  console.log('Code-Mind extension deactivated');
+  console.log('Inkstone extension deactivated');
 }
