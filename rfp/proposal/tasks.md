@@ -221,30 +221,36 @@
 
 ### 任務 4.1: 自動補全
 
-- [ ] **4.1.1 CompletionProvider 實作**
-  - 實作 `[[` 觸發邏輯
-  - 實作筆記列表過濾
-  - 實作補全項目格式化
+- [x] **4.1.1 CompletionProvider 實作** ✅ 2024-12-24
+  - 實作 `[[` 觸發邏輯（triggerCharacters: `[`）
+  - 實作筆記列表過濾（支援搜尋、當前檔案優先、按 backlink 排序）
+  - 實作補全項目格式化（含 "Create new note" 選項）
+  - 檔案：`packages/inkstone-vscode/src/providers/completion.ts`
   - _需求: Story 2.2_
 
 ### 任務 4.2: Hover 預覽
 
-- [ ] **4.2.1 HoverProvider 實作**
-  - 識別 `[[cm.xxx]]` 引用
-  - 讀取筆記內容
-  - 格式化 Hover 顯示
+- [x] **4.2.1 HoverProvider 實作** ✅ 2024-12-24
+  - 識別 `[[cm.xxx]]` 引用（使用 NOTE_REFERENCE_PATTERN）
+  - 讀取筆記內容並格式化 Markdown
+  - 實作快取機制（30 秒 TTL）提升效能
+  - 顯示屬性表格、內容預覽、backlinks、操作連結
+  - 檔案：`packages/inkstone-vscode/src/providers/hover.ts`
   - _需求: Story 2.4_
 
 ### 任務 4.3: 定義跳轉
 
-- [ ] **4.3.1 DefinitionProvider 實作**
-  - 實作 Ctrl/Cmd+Click 跳轉
-  - 找到筆記定義位置
+- [x] **4.3.1 DefinitionProvider 實作** ✅ 2024-12-24
+  - 實作 Ctrl/Cmd+Click 跳轉（F12）
+  - 找到筆記在 codemind.md 中的定義位置
+  - 檔案：`packages/inkstone-vscode/src/providers/definition.ts`
   - _需求: Story 2.4_
 
-- [ ] **4.3.2 ReferenceProvider 實作**
-  - 實作 "Find All References"
-  - 找到所有引用位置
+- [x] **4.3.2 ReferenceProvider 實作** ✅ 2024-12-24
+  - 實作 "Find All References"（Shift+F12）
+  - 搜尋整個 workspace 找到所有 `[[cm.xxx]]` 引用
+  - 可選包含 codemind.md 中的定義位置
+  - 檔案：`packages/inkstone-vscode/src/providers/reference.ts`
   - _需求: Story 2.4_
 
 ### 測試交付
