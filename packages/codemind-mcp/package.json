@@ -1,5 +1,5 @@
 {
-  "name": "@uncle6/codemind-mcp",
+  "name": "@inkstone/codemind-mcp",
   "version": "0.1.0",
   "description": "MCP Server for Code-Mind - AI tool integration",
   "type": "module",
@@ -27,7 +27,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@uncle6/codemind-core": "*",
+    "@inkstone/codemind-core": "*",
     "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
@@ -37,6 +37,7 @@
     "vitest": "^1.0.0"
   },
   "keywords": [
+    "inkstone",
     "codemind",
     "mcp",
     "ai",
