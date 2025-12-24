@@ -123,16 +123,16 @@
 
 ### 任務 2.2: 初始化指令
 
-- [ ] **2.2.1 初始化對話框**
-  - 實作 AI 工具選擇（多選）
-  - 處理已存在專案的警告
-  - 顯示初始化進度
+- [x] **2.2.1 初始化對話框** ✅ 2024-12-24
+  - 實作 AI 工具選擇（多選 QuickPick）
+  - 顯示初始化進度（ProgressLocation.Notification）
+  - 提供重載視窗選項
   - _需求: Story 3.1_
 
-- [ ] **2.2.2 Hooks 自動配置**
+- [x] **2.2.2 Hooks 自動配置** ✅ 2024-12-24
   - 在 `.claude/settings.json` 配置 Notification hook
-  - 在 `.claude/settings.json` 配置 PreToolUse hook
-  - 合併現有 hooks 設定（不覆蓋）
+  - 在 `.claude/settings.json` 配置 Stop hook
+  - 內嵌於 getClaudeSettingsTemplate() 模板
   - _需求: Story 3.4_
 
 ### 任務 2.3: 通用 AI 指引
