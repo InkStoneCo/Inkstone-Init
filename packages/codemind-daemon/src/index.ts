@@ -1,4 +1,4 @@
-// @uncle6/codemind-daemon - File watcher daemon for Code-Mind
+// @inkstone/codemind-daemon - File watcher daemon for Code-Mind
 
 export * from './watcher.js';
 export * from './processor.js';
