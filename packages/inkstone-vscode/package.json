@@ -87,6 +87,30 @@
       {
         "command": "inkstone.swarm.status",
         "title": "Inkstone: Swarm Status"
+      },
+      {
+        "command": "inkstone.daemon.start",
+        "title": "Inkstone: Start Daemon",
+        "icon": "$(play)"
+      },
+      {
+        "command": "inkstone.daemon.stop",
+        "title": "Inkstone: Stop Daemon",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "inkstone.daemon.restart",
+        "title": "Inkstone: Restart Daemon",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "inkstone.daemon.showMenu",
+        "title": "Inkstone: Daemon Menu"
+      },
+      {
+        "command": "inkstone.daemon.scan",
+        "title": "Inkstone: Scan Workspace",
+        "icon": "$(search)"
       }
     ],
     "keybindings": [
