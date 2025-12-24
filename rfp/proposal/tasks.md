@@ -53,38 +53,41 @@
 
 ### 任務 1.1: Extension 入口
 
-- [ ] **1.1.1 建立 Extension Host**
+- [x] **1.1.1 建立 Extension Host** ✅ 2024-12-24
   - 實作 `src/extension.ts` 入口點
   - 定義 activate/deactivate 生命週期
   - 配置 `package.json` contributes
   - _需求: Story 1.1_
 
-- [ ] **1.1.2 模組載入機制**
-  - 實作模組化載入架構
-  - 處理模組載入失敗的容錯
+- [x] **1.1.2 模組載入機制** ✅ 2024-12-24
+  - 實作模組化載入架構（registerSidebarViews, registerBasicCommands, registerNoteCommands）
+  - 處理模組載入失敗的容錯（registerFallbackNoteCommands）
   - 顯示歡迎訊息（首次安裝）
   - _需求: Story 1.1, Story 1.2_
 
 ### 任務 1.2: Sidebar TreeView
 
-- [ ] **1.2.1 建立 TreeView Provider**
-  - 實作 `SidebarProvider` 類別
+- [x] **1.2.1 建立 TreeView Provider** ✅ 2024-12-24
+  - 實作 4 個 TreeView Provider（MemoryTreeProvider, SparcTreeProvider, SwarmTreeProvider, VibeCodingTreeProvider）
   - 定義根節點（Notes, Memory, SPARC, Swarm, Vibe Coding）
-  - 配置圖示和樣式
+  - 配置圖示和樣式（ThemeIcon）
   - _需求: Story 1.3_
 
-- [ ] **1.2.2 功能按鈕項目**
-  - 實作 `ActionItem` 類別
-  - 定義各區塊的子按鈕
+- [x] **1.2.2 功能按鈕項目** ✅ 2024-12-24
+  - 實作 `ActionItem` 類別（繼承 TreeItem）
+  - 定義各區塊的子按鈕（Save/Restore/Search Memory, Architect/Coder/TDD, Init/Status Swarm, 5 Stages Vibe Coding）
   - 連結按鈕到對應指令
   - _需求: Story 1.3, Story 6.1_
 
 ### 任務 1.3: 基礎指令註冊
 
-- [ ] **1.3.1 註冊 Inkstone 指令**
+- [x] **1.3.1 註冊 Inkstone 指令** ✅ 2024-12-24
   - 註冊 `inkstone.initProject` 指令
   - 註冊 `inkstone.startVibeCoding` 指令
-  - 配置指令的 when 條件
+  - 註冊 Memory 指令（saveMemory, restoreMemory, searchMemory）
+  - 註冊 SPARC 指令（sparc.architect, sparc.coder, sparc.tdd）
+  - 註冊 Swarm 指令（swarm.init, swarm.status）
+  - 註冊 Vibe Coding 指令（vibeCoding.goToStage）
   - _需求: Story 3.1, Story 4.1_
 
 ### 測試交付
