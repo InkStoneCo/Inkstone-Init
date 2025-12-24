@@ -1,4 +1,4 @@
-import type { Note, NoteId, NotePath, RelatedNote, SearchResult, ProjectRoot, ParseResult } from '../types/index.js';
+import type { Note, NoteId, NotePath, NoteProperties, RelatedNote, SearchResult, ProjectRoot, ParseResult } from '../types/index.js';
 /**
  * NoteStore 介面
  */
@@ -13,7 +13,7 @@ export interface NoteStore {
     getOrphans(): Note[];
     getPopular(limit?: number): Note[];
     search(query: string, limit?: number): SearchResult[];
-    addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId): Note;
+    addNote(file: string, content: string, parentId?: NoteId, noteId?: NoteId, extraProperties?: Partial<NoteProperties>): Note;
     updateNote(id: NoteId, content: string): Note;
     deleteNote(id: NoteId): void;
     moveNote(id: NoteId, newFile: string, newLine?: number): Note;
