@@ -346,7 +346,43 @@
 
 **User Story:** As a 開發者, I want 有通用的 AI 指引文件, So that 任何 AI 工具都能理解專案規範。
 
-#### Acceptance Criteria (EARS)
+#### 驗收標準
 1. When 初始化專案, the system shall 建立 `AI_GUIDE.md` 通用指引文件
 2. When 建立指引, the system shall 包含專案結構、開發流程、記憶系統使用說明
 3. When 專案設定變更, the system shall 提示用戶更新 AI 指引
+
+---
+
+## Epic 10: 文件格式規範
+
+確保 AI 生成的需求文件遵循統一的格式規範。
+
+### Story 10.1: 中英混合格式規範
+
+**User Story:** As a 台灣用戶, I want 文件主要使用中文但關鍵詞保持英文, So that 我可以理解內容同時保持專業術語的一致性。
+
+#### 驗收標準
+1. When AI 生成 User Story, the system shall 使用格式：「As a 角色, I want 功能, So that 目的」
+2. When AI 生成驗收標準, the system shall 使用格式：「When 條件, the system shall 行為」或「If 條件, the system shall 行為」
+3. When AI 生成 Gherkin 測試, the system shall 使用格式：「Given 前置條件 / When 操作 / Then 預期結果」
+4. When 生成章節標題, the system shall 使用中文（如「驗收標準」而非「Acceptance Criteria」）
+5. When 生成內容, the system shall 僅在句子中使用英文關鍵詞（As a, I want, So that, When, If, the system shall, Given, Then 等）
+
+### Story 10.2: User Story 格式
+
+**User Story:** As a 開發者, I want User Story 遵循標準格式, So that 需求描述一致且易於理解。
+
+#### 驗收標準
+1. When 生成 User Story, the system shall 使用單行格式：`**User Story:** As a 角色, I want 功能, So that 目的`
+2. When 描述角色, the system shall 使用中文角色名稱（如「開發者」、「用戶」、「Vibe Coder」）
+3. When 描述功能和目的, the system shall 使用中文描述
+
+### Story 10.3: EARS 驗收標準格式
+
+**User Story:** As a QA, I want 驗收標準遵循 EARS 格式, So that 標準清晰可測試。
+
+#### 驗收標準
+1. When 描述事件觸發行為, the system shall 使用「When 條件, the system shall 行為」格式
+2. When 描述條件判斷行為, the system shall 使用「If 條件, the system shall 行為」格式
+3. When 使用連接詞, the system shall 保持英文（When, If, the system shall, and, or）
+4. When 描述條件和行為內容, the system shall 使用中文
