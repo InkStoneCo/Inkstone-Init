@@ -633,7 +633,7 @@
 |--------|-----------|-----------|------|
 | Sprint 0 | Monorepo 結構 | 開發環境 | ✅ 完成 |
 | Sprint 1 | Extension + Sidebar | 安裝、面板顯示 | ✅ 完成 |
-| Sprint 2 | Init 模組 | 一鍵初始化 | 🔜 待開始 |
+| Sprint 2 | Init 模組 | 一鍵初始化 | ✅ 完成 |
 | Sprint 3 | 筆記核心 | 右鍵插入、TreeView | 🔜 待開始 |
 | Sprint 4 | 筆記進階 | 自動補全、跳轉 | 🔜 待開始 |
 | Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 | 🔜 待開始 |
