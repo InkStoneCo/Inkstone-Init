@@ -1,17 +1,34 @@
 {
-  "name": "codemind-vscode",
-  "displayName": "Code-Mind",
-  "description": "AI-friendly Zettelkasten note system for code",
+  "name": "inkstone-vscode",
+  "displayName": "Inkstone",
+  "description": "AI-powered development toolkit: Code-Mind notes, Vibe Coding workflow, Memory management, SPARC modes, and Swarm coordination",
   "version": "0.1.0",
-  "publisher": "codemind",
+  "publisher": "InkStoneCo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InkStoneCo/Inkstone-Init.git"
+  },
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Notebooks",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "inkstone",
+    "code-mind",
+    "zettelkasten",
+    "vibe-coding",
+    "claude-flow",
+    "ai",
+    "notes"
   ],
   "activationEvents": [
     "workspaceContains:codemind.md",
+    "workspaceContains:.claude",
     "onLanguage:markdown",
     "onLanguage:typescript",
     "onLanguage:javascript"
@@ -20,21 +37,61 @@
   "contributes": {
     "commands": [
       {
-        "command": "codemind.addNote",
-        "title": "Code-Mind: Add Note Here"
+        "command": "inkstone.initProject",
+        "title": "Inkstone: Initialize Project"
       },
       {
-        "command": "codemind.goToNote",
-        "title": "Code-Mind: Go to Note"
+        "command": "inkstone.startVibeCoding",
+        "title": "Inkstone: Start Vibe Coding"
       },
       {
-        "command": "codemind.findReferences",
-        "title": "Code-Mind: Find All References"
+        "command": "inkstone.addNote",
+        "title": "Inkstone: Add Note Here"
+      },
+      {
+        "command": "inkstone.goToNote",
+        "title": "Inkstone: Go to Note"
+      },
+      {
+        "command": "inkstone.findReferences",
+        "title": "Inkstone: Find All References"
+      },
+      {
+        "command": "inkstone.saveMemory",
+        "title": "Inkstone: Save Memory"
+      },
+      {
+        "command": "inkstone.restoreMemory",
+        "title": "Inkstone: Restore Memory"
+      },
+      {
+        "command": "inkstone.searchMemory",
+        "title": "Inkstone: Search Memory"
+      },
+      {
+        "command": "inkstone.sparc.architect",
+        "title": "Inkstone: SPARC Architect Mode"
+      },
+      {
+        "command": "inkstone.sparc.coder",
+        "title": "Inkstone: SPARC Coder Mode"
+      },
+      {
+        "command": "inkstone.sparc.tdd",
+        "title": "Inkstone: SPARC TDD Mode"
+      },
+      {
+        "command": "inkstone.swarm.init",
+        "title": "Inkstone: Init Swarm"
+      },
+      {
+        "command": "inkstone.swarm.status",
+        "title": "Inkstone: Swarm Status"
       }
     ],
     "keybindings": [
       {
-        "command": "codemind.addNote",
+        "command": "inkstone.addNote",
         "key": "ctrl+shift+m",
         "mac": "cmd+shift+m",
         "when": "editorTextFocus"
@@ -43,16 +100,41 @@
     "menus": {
       "editor/context": [
         {
-          "command": "codemind.addNote",
-          "group": "codemind@1"
+          "command": "inkstone.addNote",
+          "group": "inkstone@1"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "inkstone-sidebar",
+          "title": "Inkstone",
+          "icon": "images/sidebar-icon.svg"
         }
       ]
     },
     "views": {
-      "explorer": [
+      "inkstone-sidebar": [
         {
-          "id": "codemind-notes",
-          "name": "Code-Mind Notes"
+          "id": "inkstone-notes",
+          "name": "Notes"
+        },
+        {
+          "id": "inkstone-memory",
+          "name": "Memory"
+        },
+        {
+          "id": "inkstone-sparc",
+          "name": "SPARC"
+        },
+        {
+          "id": "inkstone-swarm",
+          "name": "Swarm"
+        },
+        {
+          "id": "inkstone-vibe-coding",
+          "name": "Vibe Coding"
         }
       ]
     }
@@ -69,7 +151,7 @@
     "package": "vsce package --no-dependencies --allow-missing-repository"
   },
   "dependencies": {
-    "@uncle6/codemind-core": "*"
+    "@inkstone/codemind-core": "*"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
@@ -80,11 +162,5 @@
     "eslint-config-prettier": "^9.1.0",
     "vitest": "^1.0.0"
   },
-  "keywords": [
-    "codemind",
-    "vscode",
-    "zettelkasten",
-    "notes"
-  ],
   "license": "Apache-2.0"
 }
