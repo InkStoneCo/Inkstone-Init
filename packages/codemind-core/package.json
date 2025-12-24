@@ -1,5 +1,5 @@
 {
-  "name": "@uncle6/codemind-core",
+  "name": "@inkstone/codemind-core",
   "version": "0.1.0",
   "description": "Core library for Code-Mind: Parser, Writer, Store, BacklinkManager",
   "type": "module",
@@ -30,6 +30,6 @@
     "eslint-config-prettier": "^9.1.0",
     "vitest": "^1.0.0"
   },
-  "keywords": ["codemind", "zettelkasten", "notes", "ai"],
+  "keywords": ["inkstone", "codemind", "zettelkasten", "notes", "ai"],
   "license": "Apache-2.0"
 }
