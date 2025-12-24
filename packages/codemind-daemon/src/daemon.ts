@@ -3,7 +3,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { createNoteStore, generateId, type NoteStore, type NoteId } from '@uncle6/codemind-core';
+import { createNoteStore, generateId, type NoteStore, type NoteId } from '@inkstone/codemind-core';
 import { createFileWatcher, type FileWatcher, type FileChangeEvent } from './watcher.js';
 import { createProcessor, type Processor, type ProcessChange } from './processor.js';
 
