@@ -2,7 +2,7 @@
 // Phase 2.3 實作
 import * as fs from 'fs';
 import * as path from 'path';
-import { createNoteStore, generateId } from '@uncle6/codemind-core';
+import { createNoteStore, generateId } from '@inkstone/codemind-core';
 import { createFileWatcher } from './watcher.js';
 import { createProcessor } from './processor.js';
 /**

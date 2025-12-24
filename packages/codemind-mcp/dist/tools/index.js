@@ -1,6 +1,6 @@
 // MCP Tools module
 // Phase 3.2 實作
-import { createNoteStore, } from '@uncle6/codemind-core';
+import { createNoteStore, } from '@inkstone/codemind-core';
 /**
  * 將 Note 轉換為 NoteDetail
  */

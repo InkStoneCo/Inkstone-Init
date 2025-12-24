@@ -1,4 +1,4 @@
-import { type NoteId, type SearchResult } from '@uncle6/codemind-core';
+import { type NoteId, type SearchResult } from '@inkstone/codemind-core';
 /**
  * 筆記詳情
  */

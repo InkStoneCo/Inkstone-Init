@@ -13,7 +13,8 @@
       "**/node_modules": true,
       "**/.git": true,
       "**/.DS_Store": true
-    }
+    },
+    "git.ignoreLimitWarning": true
   },
   "extensions": {
     "recommendations": [

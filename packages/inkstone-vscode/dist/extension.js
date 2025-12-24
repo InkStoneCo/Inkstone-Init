@@ -40,7 +40,7 @@ var vscode7 = __toESM(require("vscode"));
 var vscode = __toESM(require("vscode"));
 var path = __toESM(require("path"));
 
-// ../core/dist/parser/index.js
+// ../codemind-core/dist/parser/index.js
 var PATTERNS = {
   // 專案標題: # Code-Mind Notes
   projectTitle: /^#\s+Code-Mind\s+Notes$/,
@@ -472,7 +472,7 @@ function createParser() {
   };
 }
 
-// ../core/dist/writer/index.js
+// ../codemind-core/dist/writer/index.js
 function groupNotesByFile(notes) {
   const grouped = /* @__PURE__ */ new Map();
   for (const note of notes) {
@@ -591,10 +591,10 @@ function createWriter() {
   };
 }
 
-// ../core/dist/store/index.js
+// ../codemind-core/dist/store/index.js
 var fs = __toESM(require("fs"), 1);
 
-// ../core/dist/linker/index.js
+// ../codemind-core/dist/linker/index.js
 var NOTE_REF_PATTERN = /\[\[(cm\.[a-z0-9]+)(?:\|[^\]]+)?\]\]/g;
 function extractReferencesFromContent(content) {
   const refs = [];
@@ -780,7 +780,7 @@ function createBacklinkManager() {
   };
 }
 
-// ../core/dist/store/index.js
+// ../codemind-core/dist/store/index.js
 function defaultGenerateId() {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   let hash = "";
@@ -1098,7 +1098,7 @@ function createNoteStore(codemindPath, options = {}) {
   };
 }
 
-// ../core/dist/id/index.js
+// ../codemind-core/dist/id/index.js
 var DEFAULT_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 var ID_PATTERN = /^cm\.[a-z0-9]{6}$/;
 var REF_PATTERN = /^\[\[(cm\.[a-z0-9]+)(?:\|[^\]]+)?\]\]$/;

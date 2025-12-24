@@ -2,8 +2,8 @@
 // Phase 4.2 實作
 import * as fs from 'fs';
 import * as path from 'path';
-import { createNoteStore, } from '@uncle6/codemind-core';
-import { createDaemon } from '@uncle6/codemind-daemon';
+import { createNoteStore, } from '@inkstone/codemind-core';
+import { createDaemon } from '@inkstone/codemind-daemon';
 import { output, ensureCodemindExists, truncate, handleError, formatDate, } from '../utils.js';
 /**
  * 取得 NoteStore
