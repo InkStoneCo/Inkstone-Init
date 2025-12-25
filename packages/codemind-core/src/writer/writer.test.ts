@@ -135,7 +135,8 @@ describe('groupNotesByFile', () => {
 });
 
 describe('generateMap', () => {
-  it('should generate map with file groups', () => {
+  // 新格式：generateMap 返回空字串，Map 功能已移除
+  it('should return empty string (new format)', () => {
     const notes = [
       createTestNote({
         properties: {
@@ -162,12 +163,8 @@ describe('generateMap', () => {
     ];
 
     const map = generateMap(notes);
-    expect(map).toContain('## Map');
-    expect(map).toContain('collapsed:: true');
-    expect(map).toContain('📄 main.py');
-    expect(map).toContain('📄 utils.py');
-    expect(map).toContain('[3]');
-    expect(map).toContain('[1]');
+    // 新格式不需要 Map，返回空字串
+    expect(map).toBe('');
   });
 });
 
