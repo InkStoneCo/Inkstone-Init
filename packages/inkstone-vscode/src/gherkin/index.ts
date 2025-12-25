@@ -144,10 +144,19 @@ export function parseRequirementsFile(content: string): Epic[] {
       // 也支援 - When ... 格式
       const bulletEarsMatch = line.match(/^-\s+\*?\*?When\*?\*?\s+(.+?),?\s+\*?\*?the system shall\*?\*?\s+(.+)$/i);
       if (bulletEarsMatch) {
-        currentStory.acceptanceCriteria.push({
+        const bulletCriteria: EARSCriteria = {
           when: bulletEarsMatch[1]!.trim(),
           shall: bulletEarsMatch[2]!.trim(),
-        });
+        };
+
+        // 檢查是否有 within 限制
+        const bulletWithinMatch = bulletCriteria.shall.match(/(.+?)\s+within\s+(.+)$/i);
+        if (bulletWithinMatch) {
+          bulletCriteria.shall = bulletWithinMatch[1]!.trim();
+          bulletCriteria.within = bulletWithinMatch[2]!.trim();
+        }
+
+        currentStory.acceptanceCriteria.push(bulletCriteria);
         continue;
       }
     }

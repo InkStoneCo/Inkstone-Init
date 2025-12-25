@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1-11 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding, Gherkin, Requirements, AI Tools
+// Sprint 1-12 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding, Gherkin, Requirements, AI Tools, Testing & Optimization
 
 import * as vscode from 'vscode';
 import {
@@ -31,6 +31,7 @@ import { registerVibeCodingCommands } from './vibe-coding/index.js';
 import { registerGherkinCommands } from './gherkin/index.js';
 import { registerRequirementCommands } from './requirements/index.js';
 import { registerAIToolCommands } from './ai-tools/index.js';
+import { registerWebviewCommands } from './webview/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -223,6 +224,9 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
 
   // AI Tools commands (Sprint 11 實作)
   registerAIToolCommands(context);
+
+  // Webview commands (Sprint 12 實作)
+  registerWebviewCommands(context);
 }
 
 /**
