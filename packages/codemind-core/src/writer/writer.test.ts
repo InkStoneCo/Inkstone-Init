@@ -78,13 +78,16 @@ describe('serializeContent', () => {
 });
 
 describe('serializeNote', () => {
+  // 新格式：- [[cm.xxx]] summary
   it('should serialize a complete note', () => {
     const note = createTestNote();
     const result = serializeNote(note, 0);
 
-    expect(result).toContain('- [[cm.abc123|test.ts/abc123]]');
-    expect(result).toContain('  id:: cm.abc123');
-    expect(result).toContain('  - Test content');
+    // 新格式：- [[cm.xxx]] summary（不包含 displayPath）
+    expect(result).toContain('- [[cm.abc123]] Test content');
+    // 新格式使用 author · date 而非 id:: 屬性
+    expect(result).toContain('- human · 2024-12-01 · line 10');
+    expect(result).toContain('- Test content');
   });
 
   it('should serialize nested child notes', () => {
@@ -104,9 +107,10 @@ describe('serializeNote', () => {
     });
 
     const result = serializeNote(parent, 0);
-    expect(result).toContain('- [[cm.abc123|test.ts/abc123]]');
-    expect(result).toContain('  - [[cm.child|test.ts/abc123/child]]');
-    expect(result).toContain('    - Child content');
+    // 新格式：- [[cm.xxx]] summary
+    expect(result).toContain('- [[cm.abc123]] Test content');
+    expect(result).toContain('- [[cm.child]] Child content');
+    expect(result).toContain('- Child content');
   });
 });
 
