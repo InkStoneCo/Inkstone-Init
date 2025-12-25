@@ -169,6 +169,7 @@ describe('generateMap', () => {
 });
 
 describe('Writer.write', () => {
+  // 新格式測試
   it('should write notes without project root', () => {
     const writer = createWriter();
     const notes = [
@@ -184,7 +185,10 @@ describe('Writer.write', () => {
     ];
 
     const result = writer.write(null, notes);
-    expect(result).toContain('- [[cm.abc|test.ts/abc]]');
+    // 新格式：- [[cm.xxx]] summary（不含 displayPath）
+    expect(result).toContain('- [[cm.abc]] Test content');
+    expect(result).toContain('# Code-Mind Notes');
+    expect(result).toContain('- ## test.ts');
   });
 
   it('should write with project root', () => {
@@ -211,10 +215,11 @@ describe('Writer.write', () => {
     ];
 
     const result = writer.write(projectRoot, notes);
-    expect(result).toContain('- # CodeMind');
-    expect(result).toContain('id:: project-root');
-    expect(result).toContain('name:: Test Project');
-    expect(result).toContain('- [[cm.abc|test.ts/abc]]');
+    // 新格式：# Code-Mind Notes 和 - Project: Name
+    expect(result).toContain('# Code-Mind Notes');
+    expect(result).toContain('- Project: Test Project');
+    expect(result).toContain('- Created: 2024-12-01');
+    expect(result).toContain('- [[cm.abc]] Test content');
   });
 
   it('should sort notes by ID when sortNotes is true', () => {
