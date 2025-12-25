@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1 + Sprint 2 實作
+// Sprint 1-12 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding, Gherkin, Requirements, AI Tools, Testing & Optimization
 
 import * as vscode from 'vscode';
 import {
@@ -19,11 +19,19 @@ import {
   SparcTreeProvider,
   SwarmTreeProvider,
   VibeCodingTreeProvider,
+  RequirementsTreeProvider,
   clearHoverCache,
 } from './providers/index.js';
 import { registerDaemonCommands } from './daemon-manager.js';
 import { scaffoldProject, type AITool } from './init/index.js';
 import { saveMemoryHandler, restoreMemoryHandler, searchMemoryHandler } from './memory/index.js';
+import { registerSparcCommands } from './sparc/index.js';
+import { registerSwarmCommands, disposeSwarm } from './swarm/index.js';
+import { registerVibeCodingCommands } from './vibe-coding/index.js';
+import { registerGherkinCommands } from './gherkin/index.js';
+import { registerRequirementCommands } from './requirements/index.js';
+import { registerAIToolCommands } from './ai-tools/index.js';
+import { registerWebviewCommands } from './webview/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -118,7 +126,13 @@ function registerSidebarViews(context: vscode.ExtensionContext) {
     treeDataProvider: vibeCodingProvider,
   });
 
-  context.subscriptions.push(memoryView, sparcView, swarmView, vibeCodingView);
+  // Requirements TreeView (Sprint 10)
+  const requirementsProvider = new RequirementsTreeProvider();
+  const requirementsView = vscode.window.createTreeView('inkstone-requirements', {
+    treeDataProvider: requirementsProvider,
+  });
+
+  context.subscriptions.push(memoryView, sparcView, swarmView, vibeCodingView, requirementsView);
 }
 
 /**
@@ -180,21 +194,8 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
     })
   );
 
-  // Start Vibe Coding
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.startVibeCoding', () => {
-      vscode.window.showInformationMessage('Inkstone: Starting Vibe Coding workflow...');
-      // TODO: Implement in Sprint 8
-    })
-  );
-
-  // Vibe Coding go to stage
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.vibeCoding.goToStage', (stage: number) => {
-      vscode.window.showInformationMessage(`Inkstone: Going to stage ${stage + 1}...`);
-      // TODO: Implement in Sprint 8
-    })
-  );
+  // Vibe Coding commands (Sprint 8 實作)
+  registerVibeCodingCommands(context);
 
   // Memory commands (Sprint 5 實作)
   context.subscriptions.push(
@@ -209,71 +210,23 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('inkstone.searchMemory', searchMemoryHandler)
   );
 
-  // SPARC commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.sparc.architect', async () => {
-      const task = await vscode.window.showInputBox({
-        prompt: 'Enter architecture task',
-        placeHolder: 'Design system architecture for...',
-      });
-      if (task) {
-        const terminal = vscode.window.createTerminal('SPARC Architect');
-        terminal.sendText(`claude-flow sparc run architect "${task}"`);
-        terminal.show();
-      }
-    })
-  );
+  // SPARC commands (Sprint 6 實作)
+  registerSparcCommands(context);
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.sparc.coder', async () => {
-      const task = await vscode.window.showInputBox({
-        prompt: 'Enter coding task',
-        placeHolder: 'Implement...',
-      });
-      if (task) {
-        const terminal = vscode.window.createTerminal('SPARC Coder');
-        terminal.sendText(`claude-flow sparc run coder "${task}"`);
-        terminal.show();
-      }
-    })
-  );
+  // Swarm commands (Sprint 7 實作)
+  registerSwarmCommands(context);
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.sparc.tdd', async () => {
-      const task = await vscode.window.showInputBox({
-        prompt: 'Enter TDD task',
-        placeHolder: 'Write tests for...',
-      });
-      if (task) {
-        const terminal = vscode.window.createTerminal('SPARC TDD');
-        terminal.sendText(`claude-flow sparc run tdd "${task}"`);
-        terminal.show();
-      }
-    })
-  );
+  // Gherkin commands (Sprint 9 實作)
+  registerGherkinCommands(context);
 
-  // Swarm commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.swarm.init', async () => {
-      const topology = await vscode.window.showQuickPick(
-        ['mesh', 'hierarchical', 'ring', 'star'],
-        { placeHolder: 'Select swarm topology' }
-      );
-      if (topology) {
-        const terminal = vscode.window.createTerminal('Swarm Init');
-        terminal.sendText(`claude-flow hive init --topology ${topology}`);
-        terminal.show();
-      }
-    })
-  );
+  // Requirements commands (Sprint 10 實作)
+  registerRequirementCommands(context);
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.swarm.status', () => {
-      const terminal = vscode.window.createTerminal('Swarm Status');
-      terminal.sendText('claude-flow hive status');
-      terminal.show();
-    })
-  );
+  // AI Tools commands (Sprint 11 實作)
+  registerAIToolCommands(context);
+
+  // Webview commands (Sprint 12 實作)
+  registerWebviewCommands(context);
 }
 
 /**
@@ -518,5 +471,6 @@ async function findReferencesHandler(noteId?: NoteId) {
 export function deactivate() {
   console.log('Inkstone extension is deactivating...');
   extensionStore.dispose();
+  disposeSwarm();
   console.log('Inkstone extension deactivated');
 }

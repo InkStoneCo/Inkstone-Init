@@ -38,9 +38,9 @@ rfp/*~
 claude-flow.config.json
 .roomodes
 
-# Claude Flow 記憶和資料檔案
-memory/
-coordination/
+# Claude Flow 記憶和資料檔案（根目錄層級）
+/memory/
+/coordination/
 *.db
 *.db-journal
 *.db-wal
