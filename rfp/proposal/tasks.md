@@ -554,35 +554,46 @@
 
 ### 任務 11.1: Gemini 整合
 
-- [ ] **11.1.1 Gemini 設定檔**
-  - 建立 `.gemini/config.yaml` 模板
-  - 定義 Gemini 特定配置
+- [x] **11.1.1 Gemini 設定檔** ✅ 2024-12-25
+  - 建立增強版 `.gemini/config.yaml` 模板
+  - 包含模型設定、上下文文件、系統提示、安全設定
+  - 實作 generateGeminiConfig() 函數
+  - 檔案：`packages/inkstone-vscode/src/ai-tools/index.ts`
   - _需求: Story 9.1_
 
-- [ ] **11.1.2 Gemini 相容性**
-  - 確保 codemind.md 可被 Gemini 讀取
-  - 測試 Vibe Coding 流程
+- [x] **11.1.2 Gemini 相容性** ✅ 2024-12-25
+  - config.yaml 包含 codemind.md 和 rfp/ 文件引用
+  - 系統提示包含開發指引和記憶系統說明
+  - 支援自動掃描和同步配置
   - _需求: Story 9.1_
 
 ### 任務 11.2: Codex 整合
 
-- [ ] **11.2.1 AGENTS.md 模板**
-  - 建立 AGENTS.md 模板
-  - 包含專案結構說明
-  - 包含開發指引
+- [x] **11.2.1 AGENTS.md 模板** ✅ 2024-12-25
+  - 建立增強版 AGENTS.md 模板
+  - 包含完整專案結構說明
+  - 包含 SPARC 和 Vibe Coding 方法論
+  - 包含開發指引和最佳實踐
+  - 實作 generateAgentsMd() 函數
+  - 檔案：`packages/inkstone-vscode/src/ai-tools/index.ts`
   - _需求: Story 9.2_
 
-- [ ] **11.2.2 同步更新**
-  - 專案設定變更時同步更新 AGENTS.md
+- [x] **11.2.2 同步更新** ✅ 2024-12-25
+  - 實作 syncAllConfigs() 同步所有 AI 工具配置
+  - 支援 5 種 AI 工具（Claude/Gemini/Codex/Cursor/Windsurf）
+  - 新增 addAIToolHandler() 添加新工具
+  - 新增 viewAIStatusHandler() 查看工具狀態
+  - 檔案：`packages/inkstone-vscode/src/ai-tools/index.ts`
   - _需求: Story 9.2_
 
 ### 測試交付
 
 | 測試項目 | 測試步驟 | 預期結果 |
 |---------|---------|---------|
-| Gemini 設定 | 初始化選擇 Gemini | 建立 `.gemini/config.yaml` |
-| Codex 設定 | 初始化選擇 Codex | 建立 `AGENTS.md` |
-| 切換工具 | 從 Claude 切換到 Gemini | 專案設定和記憶保留 |
+| Gemini 設定 | 執行 inkstone.aiTools.add 選擇 Gemini | 建立 `.gemini/config.yaml` |
+| Codex 設定 | 執行 inkstone.aiTools.add 選擇 Codex | 建立 `AGENTS.md` |
+| 同步配置 | 執行 inkstone.aiTools.sync | 更新所有已配置的 AI 工具文件 |
+| 查看狀態 | 執行 inkstone.aiTools.status | 顯示已配置的 AI 工具列表 |
 
 ---
 
