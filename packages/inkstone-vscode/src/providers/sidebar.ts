@@ -1,5 +1,5 @@
 // Inkstone Sidebar Providers
-// Sprint 1.2 + Sprint 6 + Sprint 7 + Sprint 8 實作
+// Sprint 1.2 + Sprint 6 + Sprint 7 + Sprint 8 + Sprint 10 實作
 
 import * as vscode from 'vscode';
 import { getCoreModes, getExtendedModes, type SparcMode } from '../sparc/index.js';
@@ -10,6 +10,12 @@ import {
   WORKFLOW_STAGES,
   type WorkflowProgress,
 } from '../vibe-coding/index.js';
+import {
+  onRequirementsChange,
+  getRequirements,
+  REQUIREMENT_TYPES,
+  type Requirement,
+} from '../requirements/index.js';
 
 /**
  * Action item for sidebar buttons
@@ -479,6 +485,148 @@ export class VibeCodingTreeProvider implements vscode.TreeDataProvider<vscode.Tr
         (index === progress.currentStage ? '→' : '○');
       tooltip.appendMarkdown(`${status} ${index + 1}. ${stage.name}\n\n`);
     });
+
+    tooltip.isTrusted = true;
+    return tooltip;
+  }
+}
+
+/**
+ * Requirements TreeView Provider
+ * Sprint 10 實作：需求管理列表
+ */
+export class RequirementsTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
+  readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+
+  private disposables: vscode.Disposable[] = [];
+
+  constructor() {
+    // 訂閱需求列表變更事件
+    this.disposables.push(
+      onRequirementsChange(() => this.refresh())
+    );
+  }
+
+  refresh(): void {
+    this._onDidChangeTreeData.fire();
+  }
+
+  dispose(): void {
+    this.disposables.forEach(d => d.dispose());
+  }
+
+  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
+    return element;
+  }
+
+  getChildren(): vscode.TreeItem[] {
+    const requirements = getRequirements();
+    const items: vscode.TreeItem[] = [];
+
+    // 新增需求按鈕
+    items.push(
+      new ActionItem(
+        'New Requirement',
+        { command: 'inkstone.requirements.new', title: 'New Requirement' },
+        '建立新的需求',
+        'add'
+      )
+    );
+
+    // 刷新按鈕
+    items.push(
+      new ActionItem(
+        'Refresh',
+        { command: 'inkstone.requirements.refresh', title: 'Refresh' },
+        '刷新需求列表',
+        'refresh'
+      )
+    );
+
+    // 需求計數
+    if (requirements.length > 0) {
+      const countItem = new vscode.TreeItem(
+        `共 ${requirements.length} 個需求`,
+        vscode.TreeItemCollapsibleState.None
+      );
+      countItem.iconPath = new vscode.ThemeIcon('folder-library');
+      items.push(countItem);
+    }
+
+    // 需求列表
+    for (const req of requirements) {
+      const item = this.createRequirementItem(req);
+      items.push(item);
+    }
+
+    // 如果沒有需求，顯示提示
+    if (requirements.length === 0) {
+      const emptyItem = new vscode.TreeItem(
+        '尚無任何需求',
+        vscode.TreeItemCollapsibleState.None
+      );
+      emptyItem.iconPath = new vscode.ThemeIcon('info');
+      emptyItem.tooltip = '點擊 "New Requirement" 建立第一個需求';
+      items.push(emptyItem);
+    }
+
+    return items;
+  }
+
+  /**
+   * 建立需求項目
+   */
+  private createRequirementItem(req: Requirement): vscode.TreeItem {
+    const typeInfo = REQUIREMENT_TYPES.find(t => t.id === req.type);
+    const icon = typeInfo?.icon || 'file';
+
+    const item = new vscode.TreeItem(
+      req.name,
+      vscode.TreeItemCollapsibleState.None
+    );
+
+    item.iconPath = new vscode.ThemeIcon(icon);
+    item.command = {
+      command: 'inkstone.requirements.open',
+      title: 'Open Requirement',
+      arguments: [req],
+    };
+
+    // 狀態指示
+    const statusParts: string[] = [];
+    if (req.hasProposal) statusParts.push('Proposal');
+    if (req.hasGherkin) statusParts.push('Gherkin');
+    item.description = statusParts.length > 0 ? statusParts.join(', ') : 'RFP';
+
+    // Tooltip
+    item.tooltip = this.createRequirementTooltip(req, typeInfo);
+
+    // Context value for menus
+    item.contextValue = 'requirement';
+
+    return item;
+  }
+
+  /**
+   * 建立需求 Tooltip
+   */
+  private createRequirementTooltip(
+    req: Requirement,
+    typeInfo: typeof REQUIREMENT_TYPES[number] | undefined
+  ): vscode.MarkdownString {
+    const tooltip = new vscode.MarkdownString();
+
+    tooltip.appendMarkdown(`### $(${typeInfo?.icon || 'file'}) ${req.name}\n\n`);
+    tooltip.appendMarkdown(`**類型**: ${typeInfo?.name || req.type}\n\n`);
+    tooltip.appendMarkdown(`**建立日期**: ${req.createdAt.toLocaleDateString('zh-TW')}\n\n`);
+
+    tooltip.appendMarkdown('**狀態**:\n');
+    tooltip.appendMarkdown(`- RFP: ${req.hasRfp ? '✓' : '○'}\n`);
+    tooltip.appendMarkdown(`- Proposal: ${req.hasProposal ? '✓' : '○'}\n`);
+    tooltip.appendMarkdown(`- Gherkin: ${req.hasGherkin ? '✓' : '○'}\n\n`);
+
+    tooltip.appendMarkdown(`*ID: ${req.id}*`);
 
     tooltip.isTrusted = true;
     return tooltip;

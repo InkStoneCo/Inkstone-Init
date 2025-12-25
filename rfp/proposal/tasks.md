@@ -516,28 +516,35 @@
 
 ### 任務 10.1: 需求管理模組
 
-- [ ] **10.1.1 新增需求指令**
-  - 實作需求類型選擇（新功能/修正）
-  - 實作功能名稱輸入
+- [x] **10.1.1 新增需求指令** ✅ 2024-12-25
+  - 實作需求類型選擇（Feature/Fix/Enhancement/Refactor）
+  - 實作功能名稱輸入（含驗證）
+  - 自動生成需求 ID（日期-類型-名稱格式）
+  - 檔案：`packages/inkstone-vscode/src/requirements/index.ts`
   - _需求: Story 8.1_
 
-- [ ] **10.1.2 需求資料夾生成**
-  - 建立 `requirements/{feature-name}/` 結構
-  - 包含完整的 `rfp/` 和 `proposal/` 子目錄
+- [x] **10.1.2 需求資料夾生成** ✅ 2024-12-25
+  - 建立 `requirements/{id}/` 結構
+  - 包含 `rfp/`、`proposal/`、`rfp/Gherkin/` 子目錄
+  - 自動生成 README.md 和 initial-requirements.md 模板
+  - 檔案：`packages/inkstone-vscode/src/requirements/index.ts`
   - _需求: Story 8.2_
 
-- [ ] **10.1.3 需求列表顯示**
-  - 在 Sidebar 顯示所有需求版本
-  - 按時間順序排列
+- [x] **10.1.3 需求列表顯示** ✅ 2024-12-25
+  - 實作 RequirementsTreeProvider 在 Sidebar 顯示
+  - 按時間順序排列（最新在前）
+  - 顯示需求類型圖示和狀態（RFP/Proposal/Gherkin）
+  - Markdown Tooltip 顯示詳細資訊
+  - 檔案：`packages/inkstone-vscode/src/providers/sidebar.ts`
   - _需求: Story 8.2_
 
 ### 測試交付
 
 | 測試項目 | 測試步驟 | 預期結果 |
 |---------|---------|---------|
-| 新增需求 | Command Palette → "Inkstone: New Requirement" | 顯示類型選擇對話框 |
-| 建立資料夾 | 選擇「新功能」→ 輸入名稱 | 建立 `requirements/{name}/` 結構 |
-| 需求列表 | 查看 Sidebar | 顯示所有需求版本 |
+| 新增需求 | 執行 inkstone.requirements.new | 顯示類型選擇對話框 |
+| 建立資料夾 | 選擇「新功能」→ 輸入名稱 | 建立 `requirements/{id}/` 結構 |
+| 需求列表 | 查看 Sidebar Requirements 區塊 | 顯示所有需求版本 |
 
 ---
 

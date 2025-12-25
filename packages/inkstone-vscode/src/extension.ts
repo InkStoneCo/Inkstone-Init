@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1-9 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding, Gherkin
+// Sprint 1-10 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding, Gherkin, Requirements
 
 import * as vscode from 'vscode';
 import {
@@ -19,6 +19,7 @@ import {
   SparcTreeProvider,
   SwarmTreeProvider,
   VibeCodingTreeProvider,
+  RequirementsTreeProvider,
   clearHoverCache,
 } from './providers/index.js';
 import { registerDaemonCommands } from './daemon-manager.js';
@@ -28,6 +29,7 @@ import { registerSparcCommands } from './sparc/index.js';
 import { registerSwarmCommands, disposeSwarm } from './swarm/index.js';
 import { registerVibeCodingCommands } from './vibe-coding/index.js';
 import { registerGherkinCommands } from './gherkin/index.js';
+import { registerRequirementCommands } from './requirements/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -122,7 +124,13 @@ function registerSidebarViews(context: vscode.ExtensionContext) {
     treeDataProvider: vibeCodingProvider,
   });
 
-  context.subscriptions.push(memoryView, sparcView, swarmView, vibeCodingView);
+  // Requirements TreeView (Sprint 10)
+  const requirementsProvider = new RequirementsTreeProvider();
+  const requirementsView = vscode.window.createTreeView('inkstone-requirements', {
+    treeDataProvider: requirementsProvider,
+  });
+
+  context.subscriptions.push(memoryView, sparcView, swarmView, vibeCodingView, requirementsView);
 }
 
 /**
@@ -208,6 +216,9 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
 
   // Gherkin commands (Sprint 9 實作)
   registerGherkinCommands(context);
+
+  // Requirements commands (Sprint 10 實作)
+  registerRequirementCommands(context);
 }
 
 /**
