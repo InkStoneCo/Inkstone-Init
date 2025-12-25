@@ -271,35 +271,39 @@
 
 ### 任務 5.1: Memory 模組
 
-- [ ] **5.1.1 記憶類型筆記**
-  - 擴展 Note interface 加入 `type: 'memory'`
+- [x] **5.1.1 記憶類型筆記** ✅ 2024-12-25
+  - 擴展 Note interface 加入 `type: 'memory'`（已在 codemind-core/types 實作）
   - 實作記憶專用的儲存邏輯
   - _需求: Story 5.1_
 
-- [ ] **5.1.2 Save Memory 指令**
-  - 實作輸入對話框（標題 + 內容）
+- [x] **5.1.2 Save Memory 指令** ✅ 2024-12-25
+  - 實作輸入對話框（標題 + 內容 + 標籤）
   - 建立 memory 類型筆記
   - 顯示成功通知
+  - 檔案：`packages/inkstone-vscode/src/memory/index.ts`
   - _需求: Story 5.1_
 
-- [ ] **5.1.3 Restore Memory 指令**
+- [x] **5.1.3 Restore Memory 指令** ✅ 2024-12-25
   - 讀取所有 memory 類型筆記
-  - 格式化輸出
-  - 複製到剪貼簿
+  - 支援三種恢復方式：複製全部、選擇特定、插入編輯器
+  - 格式化輸出並複製到剪貼簿
+  - 檔案：`packages/inkstone-vscode/src/memory/index.ts`
   - _需求: Story 5.2_
 
-- [ ] **5.1.4 Search Memory 指令**
-  - 實作搜尋對話框
-  - 即時顯示符合結果
-  - 點擊結果跳轉
+- [x] **5.1.4 Search Memory 指令** ✅ 2024-12-25
+  - 實作即時搜尋對話框（QuickPick）
+  - 支援標題、標籤、內容搜尋
+  - 點擊結果可複製、插入、跳轉或刪除
+  - 檔案：`packages/inkstone-vscode/src/memory/index.ts`
   - _需求: Story 5.3_
 
 ### 任務 5.2: Memory 區塊 UI
 
-- [ ] **5.2.1 Memory 按鈕連結**
-  - 連結 Save Memory 按鈕
+- [x] **5.2.1 Memory 按鈕連結** ✅ 2024-12-25
+  - 連結 Save Memory 按鈕（已在 Sprint 1 實作）
   - 連結 Restore Memory 按鈕
   - 連結 Search Memory 按鈕
+  - 檔案：`packages/inkstone-vscode/src/providers/sidebar.ts`
   - _需求: Story 5.1, 5.2, 5.3_
 
 ### 測試交付
@@ -648,7 +652,7 @@
 | Sprint 2 | Init 模組 | 一鍵初始化 | ✅ 完成 |
 | Sprint 3 | 筆記核心 | 右鍵插入、TreeView、Daemon | ✅ 完成 |
 | Sprint 4 | 筆記進階 | 自動補全、跳轉 | ✅ 完成 |
-| Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 | 🔜 待開始 |
+| Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 | ✅ 完成 |
 | Sprint 6 | SPARC 模式 | 按鈕執行指令 | 🔜 待開始 |
 | Sprint 7 | Swarm 協調 | 初始化、監控 | 🔜 待開始 |
 | Sprint 8 | Vibe Coding | 階段式引導 | 🔜 待開始 |
