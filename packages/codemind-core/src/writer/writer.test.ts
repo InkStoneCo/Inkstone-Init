@@ -30,6 +30,8 @@ function createTestNote(overrides: Partial<Note> = {}): Note {
 }
 
 describe('serializeProperties', () => {
+  // 新格式：serializeProperties 現在是 formatMetadata 的別名
+  // 返回 "author · date · line X" 格式
   it('should serialize basic properties', () => {
     const props: NoteProperties = {
       id: 'cm.abc123' as NoteId,
@@ -37,10 +39,8 @@ describe('serializeProperties', () => {
       created: '2024-12-01',
     };
 
-    const lines = serializeProperties(props, 1);
-    expect(lines).toContain('  id:: cm.abc123');
-    expect(lines).toContain('  author:: human');
-    expect(lines).toContain('  created:: 2024-12-01');
+    const result = serializeProperties(props, 1);
+    expect(result).toBe('human · 2024-12-01');
   });
 
   it('should serialize optional properties', () => {
@@ -56,13 +56,9 @@ describe('serializeProperties', () => {
       backlink_count: 1,
     };
 
-    const lines = serializeProperties(props, 1);
-    expect(lines).toContain('  file:: main.py');
-    expect(lines).toContain('  line:: 15');
-    expect(lines).toContain('  parent:: cm.parent');
-    expect(lines).toContain('  related:: [[cm.rel1]], [[cm.rel2]]');
-    expect(lines).toContain('  backlinks:: [[cm.back1]]');
-    expect(lines).toContain('  backlink_count:: 1');
+    const result = serializeProperties(props, 1);
+    // 新格式只包含 author · date · line
+    expect(result).toBe('ai · 2024-12-01 · line 15');
   });
 });
 
