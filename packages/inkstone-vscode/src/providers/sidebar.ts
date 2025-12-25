@@ -1,9 +1,15 @@
 // Inkstone Sidebar Providers
-// Sprint 1.2 + Sprint 6 + Sprint 7 實作
+// Sprint 1.2 + Sprint 6 + Sprint 7 + Sprint 8 實作
 
 import * as vscode from 'vscode';
 import { getCoreModes, getExtendedModes, type SparcMode } from '../sparc/index.js';
 import { onSwarmStatusChange, getSwarmStatus, type SwarmStatus, type SwarmState } from '../swarm/index.js';
+import {
+  onWorkflowProgressChange,
+  getWorkflowProgress,
+  WORKFLOW_STAGES,
+  type WorkflowProgress,
+} from '../vibe-coding/index.js';
 
 /**
  * Action item for sidebar buttons
@@ -332,56 +338,149 @@ export class SwarmTreeProvider implements vscode.TreeDataProvider<vscode.TreeIte
 
 /**
  * Vibe Coding TreeView Provider
+ * Sprint 8 增強：整合 workflow 進度事件
  */
-export class VibeCodingTreeProvider implements vscode.TreeDataProvider<ActionItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<ActionItem | undefined | void>();
+export class VibeCodingTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  private currentStage: number = 0;
-  private stages = [
-    '理解需求',
-    'User Story Mapping',
-    'EARS 驗收標準',
-    '系統設計',
-    '任務分解',
-  ];
+  private disposables: vscode.Disposable[] = [];
+
+  constructor() {
+    // 訂閱進度變更事件
+    this.disposables.push(
+      onWorkflowProgressChange(() => this.refresh())
+    );
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
   }
 
-  setStage(stage: number): void {
-    this.currentStage = stage;
-    this.refresh();
+  dispose(): void {
+    this.disposables.forEach(d => d.dispose());
   }
 
-  getTreeItem(element: ActionItem): vscode.TreeItem {
+  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element;
   }
 
-  getChildren(): ActionItem[] {
-    const items: ActionItem[] = [
-      new ActionItem(
-        'Start Vibe Coding',
-        { command: 'inkstone.startVibeCoding', title: 'Start Vibe Coding' },
-        'Start the Vibe Coding workflow',
-        'play'
-      ),
-    ];
+  getChildren(): vscode.TreeItem[] {
+    const progress = getWorkflowProgress();
+    const items: vscode.TreeItem[] = [];
 
-    // Add stage indicators
-    this.stages.forEach((stage, index) => {
-      const icon = index < this.currentStage ? 'pass' :
-                   index === this.currentStage ? 'arrow-right' : 'circle-outline';
-      const item = new ActionItem(
-        `${index + 1}. ${stage}`,
-        { command: 'inkstone.vibeCoding.goToStage', title: stage, arguments: [index] },
-        `Stage ${index + 1}: ${stage}`,
-        icon
+    // 開始按鈕
+    const startItem = new ActionItem(
+      progress.state === 'idle' ? 'Start Vibe Coding' : 'Continue Vibe Coding',
+      { command: 'inkstone.startVibeCoding', title: 'Start Vibe Coding' },
+      progress.state === 'idle' ? '開始 Vibe Coding 工作流程' : '繼續上次的進度',
+      progress.state === 'idle' ? 'play' : 'debug-continue'
+    );
+    items.push(startItem);
+
+    // 進度指示器
+    if (progress.state !== 'idle') {
+      const progressItem = new vscode.TreeItem(
+        `進度: ${progress.completedStages.filter(s => s).length}/5 階段`,
+        vscode.TreeItemCollapsibleState.None
       );
+      progressItem.iconPath = new vscode.ThemeIcon('pie-chart');
+      progressItem.tooltip = this.createProgressTooltip(progress);
+      items.push(progressItem);
+    }
+
+    // 階段列表
+    WORKFLOW_STAGES.forEach((stage, index) => {
+      const completed = progress.completedStages[index] ?? false;
+      const isCurrent = index === progress.currentStage && progress.state === 'active';
+
+      const icon = completed ? 'pass' : isCurrent ? 'arrow-right' : 'circle-outline';
+      const item = this.createStageItem(stage, index, icon, completed, isCurrent);
       items.push(item);
     });
 
+    // 檢測進度按鈕
+    const detectItem = new ActionItem(
+      'Detect Progress',
+      { command: 'inkstone.vibeCoding.detectProgress', title: 'Detect Progress' },
+      '檢測專案中的 RFP 進度',
+      'search'
+    );
+    items.push(detectItem);
+
     return items;
+  }
+
+  /**
+   * 建立階段項目
+   */
+  private createStageItem(
+    stage: typeof WORKFLOW_STAGES[number],
+    index: number,
+    icon: string,
+    completed: boolean,
+    isCurrent: boolean
+  ): vscode.TreeItem {
+    const item = new vscode.TreeItem(
+      `${index + 1}. ${stage.name}`,
+      vscode.TreeItemCollapsibleState.None
+    );
+
+    item.iconPath = new vscode.ThemeIcon(icon);
+    item.command = {
+      command: 'inkstone.vibeCoding.goToStage',
+      title: stage.name,
+      arguments: [index],
+    };
+
+    // 建立 Markdown Tooltip
+    const tooltip = new vscode.MarkdownString();
+    tooltip.appendMarkdown(`### $(${stage.icon}) ${stage.name}\n\n`);
+    tooltip.appendMarkdown(`${stage.description}\n\n`);
+
+    if (stage.outputFile) {
+      tooltip.appendMarkdown(`**輸出文件**: \`${stage.outputFile}\`\n\n`);
+    }
+
+    if (completed) {
+      tooltip.appendMarkdown(`✓ **已完成**`);
+    } else if (isCurrent) {
+      tooltip.appendMarkdown(`→ **當前階段**`);
+    } else {
+      tooltip.appendMarkdown(`○ 待進行`);
+    }
+
+    tooltip.isTrusted = true;
+    item.tooltip = tooltip;
+
+    // 設定 contextValue 用於右鍵選單
+    if (completed) {
+      item.contextValue = 'vibeCodingStage-completed';
+      item.description = '✓';
+    } else if (isCurrent) {
+      item.contextValue = 'vibeCodingStage-current';
+      item.description = '←';
+    } else {
+      item.contextValue = 'vibeCodingStage-pending';
+    }
+
+    return item;
+  }
+
+  /**
+   * 建立進度 Tooltip
+   */
+  private createProgressTooltip(progress: WorkflowProgress): vscode.MarkdownString {
+    const tooltip = new vscode.MarkdownString();
+    tooltip.appendMarkdown('### Vibe Coding 進度\n\n');
+
+    WORKFLOW_STAGES.forEach((stage, index) => {
+      const status = progress.completedStages[index] ? '✓' :
+        (index === progress.currentStage ? '→' : '○');
+      tooltip.appendMarkdown(`${status} ${index + 1}. ${stage.name}\n\n`);
+    });
+
+    tooltip.isTrusted = true;
+    return tooltip;
   }
 }

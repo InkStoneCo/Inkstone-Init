@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1-7 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm
+// Sprint 1-8 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding
 
 import * as vscode from 'vscode';
 import {
@@ -26,6 +26,7 @@ import { scaffoldProject, type AITool } from './init/index.js';
 import { saveMemoryHandler, restoreMemoryHandler, searchMemoryHandler } from './memory/index.js';
 import { registerSparcCommands } from './sparc/index.js';
 import { registerSwarmCommands, disposeSwarm } from './swarm/index.js';
+import { registerVibeCodingCommands } from './vibe-coding/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -182,21 +183,8 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
     })
   );
 
-  // Start Vibe Coding
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.startVibeCoding', () => {
-      vscode.window.showInformationMessage('Inkstone: Starting Vibe Coding workflow...');
-      // TODO: Implement in Sprint 8
-    })
-  );
-
-  // Vibe Coding go to stage
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.vibeCoding.goToStage', (stage: number) => {
-      vscode.window.showInformationMessage(`Inkstone: Going to stage ${stage + 1}...`);
-      // TODO: Implement in Sprint 8
-    })
-  );
+  // Vibe Coding commands (Sprint 8 實作)
+  registerVibeCodingCommands(context);
 
   // Memory commands (Sprint 5 實作)
   context.subscriptions.push(

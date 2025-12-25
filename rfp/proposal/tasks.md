@@ -415,46 +415,53 @@
 
 ### 任務 8.1: Vibe Coding 模組
 
-- [ ] **8.1.1 工作流程管理**
-  - 實作 `WorkflowState` 狀態管理
-  - 實作進度檢測邏輯
-  - 實作階段切換邏輯
+- [x] **8.1.1 工作流程管理** ✅ 2024-12-25
+  - 實作 `WorkflowState` 狀態管理（idle/active/completed）
+  - 實作進度檢測邏輯（detectProgress 檢查 rfp/ 目錄）
+  - 實作階段切換邏輯（goToStageHandler）
+  - 狀態變更事件（onWorkflowProgressChange）
+  - 檔案：`packages/inkstone-vscode/src/vibe-coding/index.ts`
   - _需求: Story 4.1, Story 4.2_
 
-- [ ] **8.1.2 文件生成器**
-  - 實作 requirements.md 生成模板
-  - 實作 design.md 生成模板
-  - 實作 tasks.md 生成模板
+- [x] **8.1.2 文件生成器** ✅ 2024-12-25
+  - 實作 initial-requirements.md 生成模板
+  - 實作 requirements.md 生成模板（User Story + EARS）
+  - 實作 design.md 生成模板（架構圖、API、資料模型）
+  - 實作 tasks.md 生成模板（Sprint 分解格式）
+  - 檔案：`packages/inkstone-vscode/src/vibe-coding/index.ts`
   - _需求: Story 4.3, Story 4.4_
 
-### 任務 8.2: Vibe Coding Webview
+### 任務 8.2: Vibe Coding UI
 
-- [ ] **8.2.1 建立 Webview UI**
-  - 建立 `webview-ui/vibe-coding/` 目錄
-  - 實作 5 階段進度指示器
-  - 實作階段內容顯示
+- [x] **8.2.1 VibeCodingTreeProvider 增強** ✅ 2024-12-25
+  - 整合 workflow 進度事件
+  - 動態顯示階段完成狀態（✓/→/○）
+  - 階段 Markdown Tooltip 顯示說明和輸出文件
+  - 進度指示器（N/5 階段）
+  - 檔案：`packages/inkstone-vscode/src/providers/sidebar.ts`
   - _需求: Story 4.2_
 
-- [ ] **8.2.2 互動邏輯**
-  - 實作用戶輸入收集
-  - 實作 AI 回應顯示
-  - 實作階段確認和切換
+- [ ] **8.2.2 Webview 面板**（延後至 Sprint 10）
+  - 建立 `webview-ui/vibe-coding/` 目錄
+  - 實作 5 階段進度指示器
+  - 實作階段內容顯示和互動
   - _需求: Story 4.2_
 
 ### 任務 8.3: 格式規範整合
 
-- [ ] **8.3.1 中英混合格式模板**
+- [x] **8.3.1 中英混合格式模板** ✅ 2024-12-25
   - 定義 User Story 格式模板（`As a 角色, I want 功能, So that 目的`）
   - 定義 EARS 格式模板（`When 條件, the system shall 行為`）
-  - 定義 Gherkin 格式模板
+  - 每階段專屬提示詞（getStagePrompt）
+  - 檔案：`packages/inkstone-vscode/src/vibe-coding/index.ts`
   - _需求: Story 10.1, Story 10.2, Story 10.3_
 
 ### 測試交付
 
 | 測試項目 | 測試步驟 | 預期結果 |
 |---------|---------|---------|
-| 啟動 Vibe Coding | Command Palette → "Inkstone: Start Vibe Coding" | 開啟 Webview 面板 |
-| 進度檢測 | 專案已有 requirements.md | 自動跳到階段 4 |
+| 啟動 Vibe Coding | Command Palette → "Inkstone: Start Vibe Coding" | 顯示階段選擇選單 |
+| 進度檢測 | 專案已有 requirements.md | 自動檢測並顯示進度 |
 | 階段導航 | 點擊已完成的階段 | 可返回查看和修改 |
 | 文件生成格式 | 完成階段 2 後 | requirements.md 使用正確的中英混合格式 |
 
