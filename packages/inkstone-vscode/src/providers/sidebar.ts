@@ -1,7 +1,8 @@
 // Inkstone Sidebar Providers
-// Sprint 1.2 實作
+// Sprint 1.2 + Sprint 6 實作
 
 import * as vscode from 'vscode';
+import { getCoreModes, getExtendedModes, type SparcMode } from '../sparc/index.js';
 
 /**
  * Action item for sidebar buttons
@@ -10,7 +11,7 @@ export class ActionItem extends vscode.TreeItem {
   constructor(
     label: string,
     command: vscode.Command,
-    tooltip?: string,
+    tooltip?: string | vscode.MarkdownString,
     icon?: string
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
@@ -19,6 +20,32 @@ export class ActionItem extends vscode.TreeItem {
     if (icon) {
       this.iconPath = new vscode.ThemeIcon(icon);
     }
+  }
+}
+
+/**
+ * SPARC Action item with rich tooltip
+ */
+class SparcActionItem extends vscode.TreeItem {
+  constructor(mode: SparcMode) {
+    super(mode.name, vscode.TreeItemCollapsibleState.None);
+
+    this.command = {
+      command: 'inkstone.sparc.execute',
+      title: mode.name,
+      arguments: [mode.id],
+    };
+
+    // Rich Markdown tooltip
+    this.tooltip = new vscode.MarkdownString();
+    this.tooltip.appendMarkdown(`### $(${mode.icon}) ${mode.name}\n\n`);
+    this.tooltip.appendMarkdown(`${mode.description}\n\n`);
+    this.tooltip.appendMarkdown(`---\n`);
+    this.tooltip.appendMarkdown(`*點擊執行此模式*`);
+    this.tooltip.isTrusted = true;
+
+    this.iconPath = new vscode.ThemeIcon(mode.icon);
+    this.contextValue = 'sparcMode';
   }
 }
 
@@ -63,41 +90,55 @@ export class MemoryTreeProvider implements vscode.TreeDataProvider<ActionItem> {
 
 /**
  * SPARC TreeView Provider
+ * Sprint 6 增強：支援更多模式和 Hover 提示
  */
-export class SparcTreeProvider implements vscode.TreeDataProvider<ActionItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<ActionItem | undefined | void>();
+export class SparcTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
   }
 
-  getTreeItem(element: ActionItem): vscode.TreeItem {
+  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element;
   }
 
-  getChildren(): ActionItem[] {
-    return [
-      new ActionItem(
-        'Architect',
-        { command: 'inkstone.sparc.architect', title: 'Architect Mode' },
-        'Run SPARC Architect mode for system design',
-        'symbol-structure'
-      ),
-      new ActionItem(
-        'Coder',
-        { command: 'inkstone.sparc.coder', title: 'Coder Mode' },
-        'Run SPARC Coder mode for implementation',
-        'code'
-      ),
-      new ActionItem(
-        'TDD',
-        { command: 'inkstone.sparc.tdd', title: 'TDD Mode' },
-        'Run SPARC TDD mode for test-driven development',
-        'beaker'
-      ),
-    ];
+  getChildren(): vscode.TreeItem[] {
+    const items: vscode.TreeItem[] = [];
+
+    // 核心模式（前三個）
+    for (const mode of getCoreModes()) {
+      items.push(new SparcActionItem(mode));
+    }
+
+    // More... 按鈕展開更多模式
+    const moreItem = new ActionItem(
+      'More...',
+      { command: 'inkstone.sparc.more', title: 'More SPARC Modes' },
+      createMoreTooltip(),
+      'ellipsis'
+    );
+    items.push(moreItem);
+
+    return items;
   }
+}
+
+/**
+ * 建立 More 按鈕的 Tooltip
+ */
+function createMoreTooltip(): vscode.MarkdownString {
+  const tooltip = new vscode.MarkdownString();
+  tooltip.appendMarkdown('### 更多 SPARC 模式\n\n');
+
+  for (const mode of getExtendedModes()) {
+    tooltip.appendMarkdown(`- **${mode.name}**: ${mode.description}\n`);
+  }
+
+  tooltip.appendMarkdown('\n*點擊查看完整列表*');
+  tooltip.isTrusted = true;
+  return tooltip;
 }
 
 /**

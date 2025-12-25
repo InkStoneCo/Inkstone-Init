@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1 + Sprint 2 實作
+// Sprint 1 + Sprint 2 + Sprint 5 + Sprint 6 實作
 
 import * as vscode from 'vscode';
 import {
@@ -24,6 +24,7 @@ import {
 import { registerDaemonCommands } from './daemon-manager.js';
 import { scaffoldProject, type AITool } from './init/index.js';
 import { saveMemoryHandler, restoreMemoryHandler, searchMemoryHandler } from './memory/index.js';
+import { registerSparcCommands } from './sparc/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -209,48 +210,8 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('inkstone.searchMemory', searchMemoryHandler)
   );
 
-  // SPARC commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.sparc.architect', async () => {
-      const task = await vscode.window.showInputBox({
-        prompt: 'Enter architecture task',
-        placeHolder: 'Design system architecture for...',
-      });
-      if (task) {
-        const terminal = vscode.window.createTerminal('SPARC Architect');
-        terminal.sendText(`claude-flow sparc run architect "${task}"`);
-        terminal.show();
-      }
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.sparc.coder', async () => {
-      const task = await vscode.window.showInputBox({
-        prompt: 'Enter coding task',
-        placeHolder: 'Implement...',
-      });
-      if (task) {
-        const terminal = vscode.window.createTerminal('SPARC Coder');
-        terminal.sendText(`claude-flow sparc run coder "${task}"`);
-        terminal.show();
-      }
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.sparc.tdd', async () => {
-      const task = await vscode.window.showInputBox({
-        prompt: 'Enter TDD task',
-        placeHolder: 'Write tests for...',
-      });
-      if (task) {
-        const terminal = vscode.window.createTerminal('SPARC TDD');
-        terminal.sendText(`claude-flow sparc run tdd "${task}"`);
-        terminal.show();
-      }
-    })
-  );
+  // SPARC commands (Sprint 6 實作)
+  registerSparcCommands(context);
 
   // Swarm commands
   context.subscriptions.push(

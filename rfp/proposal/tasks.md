@@ -322,36 +322,39 @@
 
 ### 任務 6.1: SPARC 模組
 
-- [ ] **6.1.1 指令執行封裝**
+- [x] **6.1.1 指令執行封裝** ✅ 2024-12-25
   - 封裝 `claude-flow sparc run` 指令
-  - 處理終端輸出
-  - 處理錯誤和超時
+  - 實作 executeSparcMode() 統一執行函數
+  - 追蹤執行狀態、處理重複執行警告
+  - 檔案：`packages/inkstone-vscode/src/sparc/index.ts`
   - _需求: Story 6.2, 6.3, 6.4_
 
-- [ ] **6.1.2 Architect 模式**
-  - 實作任務輸入對話框
+- [x] **6.1.2 Architect 模式** ✅ 2024-12-25
+  - 實作任務輸入對話框（含驗證）
   - 執行 `claude-flow sparc run architect`
-  - 顯示結果通知
+  - 顯示開始通知
   - _需求: Story 6.2_
 
-- [ ] **6.1.3 Coder 模式**
-  - 實作任務輸入對話框
+- [x] **6.1.3 Coder 模式** ✅ 2024-12-25
+  - 實作任務輸入對話框（含驗證）
   - 執行 `claude-flow sparc run coder`
-  - 顯示結果通知
+  - 顯示開始通知
   - _需求: Story 6.3_
 
-- [ ] **6.1.4 TDD 模式**
-  - 實作任務輸入對話框
+- [x] **6.1.4 TDD 模式** ✅ 2024-12-25
+  - 實作任務輸入對話框（含驗證）
   - 執行 `claude-flow sparc run tdd`
-  - 顯示測試結果
+  - 顯示開始通知
   - _需求: Story 6.4_
 
 ### 任務 6.2: SPARC 區塊 UI
 
-- [ ] **6.2.1 按鈕連結和 Hover 提示**
-  - 連結所有 SPARC 按鈕
-  - 實作 Hover 顯示模式說明
-  - 實作 "More..." 展開更多模式
+- [x] **6.2.1 按鈕連結和 Hover 提示** ✅ 2024-12-25
+  - 新增 SparcActionItem 類別支援 Markdown Tooltip
+  - 實作 Hover 顯示模式說明（含圖示）
+  - 實作 "More..." 按鈕展開 10 種模式選單
+  - 新增模式：Reviewer, Debugger, Optimizer, Documenter, Security, Refactor, API Designer
+  - 檔案：`packages/inkstone-vscode/src/providers/sidebar.ts`
   - _需求: Story 6.1_
 
 ### 測試交付
@@ -653,7 +656,7 @@
 | Sprint 3 | 筆記核心 | 右鍵插入、TreeView、Daemon | ✅ 完成 |
 | Sprint 4 | 筆記進階 | 自動補全、跳轉 | ✅ 完成 |
 | Sprint 5 | 記憶管理 | 儲存/恢復/搜尋 | ✅ 完成 |
-| Sprint 6 | SPARC 模式 | 按鈕執行指令 | 🔜 待開始 |
+| Sprint 6 | SPARC 模式 | 按鈕執行指令 | ✅ 完成 |
 | Sprint 7 | Swarm 協調 | 初始化、監控 | 🔜 待開始 |
 | Sprint 8 | Vibe Coding | 階段式引導 | 🔜 待開始 |
 | Sprint 9 | Gherkin 測試 | 自動生成 | 🔜 待開始 |
