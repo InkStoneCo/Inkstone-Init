@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1-8 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding
+// Sprint 1-9 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm, Vibe Coding, Gherkin
 
 import * as vscode from 'vscode';
 import {
@@ -27,6 +27,7 @@ import { saveMemoryHandler, restoreMemoryHandler, searchMemoryHandler } from './
 import { registerSparcCommands } from './sparc/index.js';
 import { registerSwarmCommands, disposeSwarm } from './swarm/index.js';
 import { registerVibeCodingCommands } from './vibe-coding/index.js';
+import { registerGherkinCommands } from './gherkin/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -204,6 +205,9 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
 
   // Swarm commands (Sprint 7 實作)
   registerSwarmCommands(context);
+
+  // Gherkin commands (Sprint 9 實作)
+  registerGherkinCommands(context);
 }
 
 /**

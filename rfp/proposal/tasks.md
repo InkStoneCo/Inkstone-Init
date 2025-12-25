@@ -473,33 +473,40 @@
 
 ### 任務 9.1: Gherkin 生成器
 
-- [ ] **9.1.1 EARS 轉 Gherkin 邏輯**
-  - 解析 EARS 驗收標準
-  - 轉換為 Gherkin Feature/Scenario
-  - 生成 Given/When/Then 步驟
+- [x] **9.1.1 EARS 轉 Gherkin 邏輯** ✅ 2024-12-25
+  - 實作 parseRequirementsFile() 解析 Epic/Story/EARS
+  - 實作 earsToGherkin() 轉換為 Scenario
+  - 實作 epicToFeature() 生成 Feature 結構
+  - 生成 Given/When/Then 步驟（基於 As a/When/shall）
+  - 檔案：`packages/inkstone-vscode/src/gherkin/index.ts`
   - _需求: Story 4.5_
 
-- [ ] **9.1.2 檔案生成**
-  - 在 `requirements/initial/rfp/Gherkin/` 建立 .feature 檔案
-  - 按 Epic 分組生成
+- [x] **9.1.2 檔案生成** ✅ 2024-12-25
+  - 實作 generateFeatureFile() 生成 .feature 內容
+  - 在 `rfp/Gherkin/` 建立 .feature 檔案
+  - 按 Epic 分組生成（epic-N-name.feature）
+  - 新增預覽功能（previewGherkinHandler）
+  - 檔案：`packages/inkstone-vscode/src/gherkin/index.ts`
   - _需求: Story 4.5_
 
 ### 任務 9.2: Test Cases 交付
 
-- [ ] **9.2.1 Test Cases 模板**
-  - 定義 Test Cases 文件格式
-  - 包含測試環境連結
-  - 包含測試帳號資訊
-  - 包含測試步驟和預期結果
+- [x] **9.2.1 Test Cases 模板** ✅ 2024-12-25
+  - 實作 generateTestCasesTemplate() 生成完整測試文件
+  - 包含測試環境連結表格（Dev/Staging/Production）
+  - 包含測試帳號資訊表格（角色/帳號/密碼）
+  - 包含測試步驟和預期結果表格
+  - 生成 test-cases.md 文件
+  - 檔案：`packages/inkstone-vscode/src/gherkin/index.ts`
   - _需求: Story 4.6_
 
 ### 測試交付
 
 | 測試項目 | 測試步驟 | 預期結果 |
 |---------|---------|---------|
-| Gherkin 生成 | 完成階段 3 後 | 自動生成 .feature 檔案 |
+| Gherkin 生成 | 執行 inkstone.gherkin.generate | 自動生成 .feature 檔案 |
 | 格式正確 | 檢查 .feature 內容 | 使用 Feature/Scenario/Given/When/Then 格式 |
-| Test Cases | Sprint 完成後 | 生成包含連結和帳密的測試文件 |
+| Test Cases | 執行 inkstone.gherkin.testCases | 生成包含連結和帳密的測試文件 |
 
 ---
 
