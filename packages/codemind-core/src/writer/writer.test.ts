@@ -39,7 +39,7 @@ describe('serializeProperties', () => {
       created: '2024-12-01',
     };
 
-    const result = serializeProperties(props, 1);
+    const result = serializeProperties(props);
     expect(result).toBe('human · 2024-12-01');
   });
 
@@ -56,7 +56,7 @@ describe('serializeProperties', () => {
       backlink_count: 1,
     };
 
-    const result = serializeProperties(props, 1);
+    const result = serializeProperties(props);
     // 新格式只包含 author · date · line
     expect(result).toBe('ai · 2024-12-01 · line 15');
   });
