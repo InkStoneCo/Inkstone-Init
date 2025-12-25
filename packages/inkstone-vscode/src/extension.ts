@@ -1,5 +1,5 @@
 // Inkstone VSCode Extension entry point
-// Sprint 1 + Sprint 2 + Sprint 5 + Sprint 6 實作
+// Sprint 1-7 實作：Sidebar, Init, Code-Mind, Memory, SPARC, Swarm
 
 import * as vscode from 'vscode';
 import {
@@ -25,6 +25,7 @@ import { registerDaemonCommands } from './daemon-manager.js';
 import { scaffoldProject, type AITool } from './init/index.js';
 import { saveMemoryHandler, restoreMemoryHandler, searchMemoryHandler } from './memory/index.js';
 import { registerSparcCommands } from './sparc/index.js';
+import { registerSwarmCommands, disposeSwarm } from './swarm/index.js';
 import type { NoteId } from '@inkstone/codemind-core';
 
 /**
@@ -213,28 +214,8 @@ function registerBasicCommands(context: vscode.ExtensionContext) {
   // SPARC commands (Sprint 6 實作)
   registerSparcCommands(context);
 
-  // Swarm commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.swarm.init', async () => {
-      const topology = await vscode.window.showQuickPick(
-        ['mesh', 'hierarchical', 'ring', 'star'],
-        { placeHolder: 'Select swarm topology' }
-      );
-      if (topology) {
-        const terminal = vscode.window.createTerminal('Swarm Init');
-        terminal.sendText(`claude-flow hive init --topology ${topology}`);
-        terminal.show();
-      }
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('inkstone.swarm.status', () => {
-      const terminal = vscode.window.createTerminal('Swarm Status');
-      terminal.sendText('claude-flow hive status');
-      terminal.show();
-    })
-  );
+  // Swarm commands (Sprint 7 實作)
+  registerSwarmCommands(context);
 }
 
 /**
@@ -479,5 +460,6 @@ async function findReferencesHandler(noteId?: NoteId) {
 export function deactivate() {
   console.log('Inkstone extension is deactivating...');
   extensionStore.dispose();
+  disposeSwarm();
   console.log('Inkstone extension deactivated');
 }

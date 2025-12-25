@@ -1,8 +1,9 @@
 // Inkstone Sidebar Providers
-// Sprint 1.2 + Sprint 6 實作
+// Sprint 1.2 + Sprint 6 + Sprint 7 實作
 
 import * as vscode from 'vscode';
 import { getCoreModes, getExtendedModes, type SparcMode } from '../sparc/index.js';
+import { onSwarmStatusChange, getSwarmStatus, type SwarmStatus, type SwarmState } from '../swarm/index.js';
 
 /**
  * Action item for sidebar buttons
@@ -143,52 +144,189 @@ function createMoreTooltip(): vscode.MarkdownString {
 
 /**
  * Swarm TreeView Provider
+ * Sprint 7 增強：整合 swarm 模組狀態事件
  */
-export class SwarmTreeProvider implements vscode.TreeDataProvider<ActionItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<ActionItem | undefined | void>();
+export class SwarmTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  private swarmStatus: 'idle' | 'running' | 'error' = 'idle';
+  private disposables: vscode.Disposable[] = [];
+
+  constructor() {
+    // 訂閱狀態變更事件
+    this.disposables.push(
+      onSwarmStatusChange(() => this.refresh())
+    );
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
   }
 
-  setStatus(status: 'idle' | 'running' | 'error'): void {
-    this.swarmStatus = status;
-    this.refresh();
+  dispose(): void {
+    this.disposables.forEach(d => d.dispose());
   }
 
-  getTreeItem(element: ActionItem): vscode.TreeItem {
+  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element;
   }
 
-  getChildren(): ActionItem[] {
-    const items: ActionItem[] = [
-      new ActionItem(
-        'Init Swarm',
-        { command: 'inkstone.swarm.init', title: 'Init Swarm' },
-        'Initialize a new Hive-Mind swarm',
-        'rocket'
-      ),
-      new ActionItem(
-        'View Status',
-        { command: 'inkstone.swarm.status', title: 'View Status' },
-        'View current swarm status',
-        'dashboard'
-      ),
-    ];
+  getChildren(): vscode.TreeItem[] {
+    const status = getSwarmStatus();
+    const items: vscode.TreeItem[] = [];
 
-    // Add status indicator
-    const statusItem = new ActionItem(
-      `Status: ${this.swarmStatus}`,
-      { command: 'inkstone.swarm.status', title: 'View Status' },
-      `Swarm is ${this.swarmStatus}`,
-      this.swarmStatus === 'running' ? 'pass-filled' : 'circle-outline'
-    );
-    items.push(statusItem);
+    // 狀態指示器
+    items.push(this.createStatusItem(status));
+
+    // 根據狀態顯示不同的操作
+    if (status.state === 'idle') {
+      items.push(
+        new ActionItem(
+          'Init Swarm',
+          { command: 'inkstone.swarm.init', title: 'Init Swarm' },
+          '初始化新的 Hive-Mind 蜂群',
+          'rocket'
+        )
+      );
+    } else if (status.state === 'running') {
+      items.push(
+        new ActionItem(
+          'View Status',
+          { command: 'inkstone.swarm.status', title: 'View Status' },
+          '查看當前蜂群狀態',
+          'dashboard'
+        ),
+        new ActionItem(
+          'Refresh',
+          { command: 'inkstone.swarm.refresh', title: 'Refresh' },
+          '刷新狀態',
+          'refresh'
+        ),
+        new ActionItem(
+          'Stop Swarm',
+          { command: 'inkstone.swarm.stop', title: 'Stop Swarm' },
+          '停止蜂群',
+          'debug-stop'
+        )
+      );
+
+      // 顯示 Agent 資訊
+      if (status.agentCount !== undefined) {
+        const agentItem = new vscode.TreeItem(
+          `Agents: ${status.activeAgents || 0}/${status.agentCount}`,
+          vscode.TreeItemCollapsibleState.None
+        );
+        agentItem.iconPath = new vscode.ThemeIcon('account');
+        agentItem.tooltip = `活躍 Agent: ${status.activeAgents || 0}，總數: ${status.agentCount}`;
+        items.push(agentItem);
+      }
+
+      // 顯示拓撲資訊
+      if (status.topology) {
+        const topoItem = new vscode.TreeItem(
+          `Topology: ${status.topology}`,
+          vscode.TreeItemCollapsibleState.None
+        );
+        topoItem.iconPath = new vscode.ThemeIcon('type-hierarchy');
+        topoItem.tooltip = `拓撲結構: ${status.topology}`;
+        items.push(topoItem);
+      }
+    } else if (status.state === 'initializing' || status.state === 'stopping') {
+      const loadingItem = new vscode.TreeItem(
+        status.state === 'initializing' ? '初始化中...' : '停止中...',
+        vscode.TreeItemCollapsibleState.None
+      );
+      loadingItem.iconPath = new vscode.ThemeIcon('loading~spin');
+      items.push(loadingItem);
+    } else if (status.state === 'error') {
+      items.push(
+        new ActionItem(
+          'Retry Init',
+          { command: 'inkstone.swarm.init', title: 'Retry Init' },
+          '重新初始化蜂群',
+          'refresh'
+        )
+      );
+      if (status.errorMessage) {
+        const errorItem = new vscode.TreeItem(
+          `Error: ${status.errorMessage}`,
+          vscode.TreeItemCollapsibleState.None
+        );
+        errorItem.iconPath = new vscode.ThemeIcon('warning');
+        items.push(errorItem);
+      }
+    }
 
     return items;
+  }
+
+  /**
+   * 建立狀態指示器項目
+   */
+  private createStatusItem(status: SwarmStatus): vscode.TreeItem {
+    const stateLabels: Record<SwarmState, string> = {
+      idle: '閒置',
+      initializing: '初始化中',
+      running: '運行中',
+      stopping: '停止中',
+      error: '錯誤',
+    };
+
+    const stateIcons: Record<SwarmState, string> = {
+      idle: 'circle-outline',
+      initializing: 'loading~spin',
+      running: 'pass-filled',
+      stopping: 'loading~spin',
+      error: 'error',
+    };
+
+    const item = new vscode.TreeItem(
+      `狀態: ${stateLabels[status.state]}`,
+      vscode.TreeItemCollapsibleState.None
+    );
+    item.iconPath = new vscode.ThemeIcon(stateIcons[status.state]);
+    item.command = { command: 'inkstone.swarm.status', title: 'View Status' };
+    item.tooltip = this.createStatusTooltip(status);
+    item.contextValue = `swarmStatus-${status.state}`;
+
+    return item;
+  }
+
+  /**
+   * 建立狀態 Tooltip
+   */
+  private createStatusTooltip(status: SwarmStatus): vscode.MarkdownString {
+    const tooltip = new vscode.MarkdownString();
+    tooltip.appendMarkdown('### Hive-Mind Swarm\n\n');
+
+    const stateLabels: Record<SwarmState, string> = {
+      idle: '閒置',
+      initializing: '初始化中...',
+      running: '運行中',
+      stopping: '停止中...',
+      error: '錯誤',
+    };
+
+    tooltip.appendMarkdown(`**狀態**: ${stateLabels[status.state]}\n\n`);
+
+    if (status.topology) {
+      tooltip.appendMarkdown(`**拓撲**: ${status.topology}\n\n`);
+    }
+
+    if (status.agentCount !== undefined) {
+      tooltip.appendMarkdown(`**Agent**: ${status.activeAgents || 0}/${status.agentCount}\n\n`);
+    }
+
+    if (status.errorMessage) {
+      tooltip.appendMarkdown(`**錯誤**: ${status.errorMessage}\n\n`);
+    }
+
+    if (status.lastUpdate) {
+      tooltip.appendMarkdown(`*更新: ${status.lastUpdate.toLocaleTimeString('zh-TW')}*`);
+    }
+
+    tooltip.isTrusted = true;
+    return tooltip;
   }
 }
 

@@ -374,20 +374,26 @@
 
 ### 任務 7.1: Swarm 模組
 
-- [ ] **7.1.1 Init Swarm 指令**
+- [x] **7.1.1 Init Swarm 指令** ✅ 2024-12-25
   - 實作拓撲選擇對話框（mesh/hierarchical/ring/star）
-  - 實作 Agent 數量設定
-  - 執行 `claude-flow hive init`
+  - 實作 Agent 數量設定（含驗證）
+  - 執行 `claude-flow hive init` 指令
+  - 建立專用終端並顯示進度
+  - 檔案：`packages/inkstone-vscode/src/swarm/index.ts`
   - _需求: Story 7.1_
 
-- [ ] **7.1.2 Swarm 狀態監控**
-  - 實作狀態查詢邏輯
-  - 在 Sidebar 顯示狀態摘要
+- [x] **7.1.2 Swarm 狀態監控** ✅ 2024-12-25
+  - 實作狀態管理（idle/initializing/running/stopping/error）
+  - 建立狀態列顯示（StatusBarItem）
+  - 實作 SwarmTreeProvider 整合狀態事件
+  - 在 Sidebar 顯示狀態摘要（含 Agent 數量和拓撲）
+  - 支援刷新、停止等操作
+  - 檔案：`packages/inkstone-vscode/src/swarm/index.ts`, `providers/sidebar.ts`
   - _需求: Story 7.2_
 
 ### 任務 7.2: Swarm Status Webview
 
-- [ ] **7.2.1 狀態 Webview 面板**
+- [ ] **7.2.1 狀態 Webview 面板**（延後至 Sprint 9）
   - 建立 `webview-ui/swarm-status/` 目錄
   - 實作狀態顯示 UI
   - 實作即時更新
